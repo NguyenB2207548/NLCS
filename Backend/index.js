@@ -1,10 +1,16 @@
 const express = require('express');
 const app = express();
+require('dotenv').config();
+const homeRouter = require('./routes/home');
+const authRouter = require('./routes/auth');
 
-app.get('/', (req, res) => {
-    res.send('Hello World');
-})
+app.use(express.json());
 
-app.listen(3000, () => {
+const port = process.env.PORT || 3000;
+
+app.use('/', homeRouter);
+app.use('/login', authRouter);
+
+app.listen(port, () => {
     console.log('Server-running');
 })
