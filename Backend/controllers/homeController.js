@@ -1,6 +1,14 @@
+const db = require('../models/db');
 
-exports.getHomePage = (req, res) => {
-    res.json("Welcome to Home Page");
+exports.getHomePage = async (req, res) => {
+    // res.json("Welcome to Home Page");
+        try {
+            const [cars] = await db.query('SELECT * FROM car');
+            res.json(cars);
+        } catch (err) {
+            res.status(500).json({ error: err.message });
+        }
+
 }
 
 exports.postHomePage = (req, res) => {
