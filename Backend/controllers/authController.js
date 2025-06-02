@@ -1,16 +1,39 @@
+const db = require('../models/db');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 
-exports.login = (req, res) => {
-    const { userName, userPassword } = req.body;
+exports.login = async (req, res) => {
+    const { username, password } = req.body;
 
-    const exampleUser = {
-        user_name : "nguyenpham",
-        password: "abc123"
+    console.log(username);
+
+    try {
+        const [rows] = await db.execute('SELECT *FROM Users WHERE username = ?', [username]);
+
+        if (rows.length === 0) {
+            return res.status(401).json({message: 'wrong user name'});
+        }
+
+        const user = rows[0];
+
+        const token = jwt.sign(
+            {id: user.userID, username: user.username},
+            'your_jwt_secret',
+            {expiresIn: '1d'}
+        )
+
+        res.json({
+            message: 'Login success',
+            token,
+            user: {
+                id: user.userID,
+                username: user.username,
+            }
+        })
+    }
+    catch (err) {
+        console.error('Error Login', err);
+        res.status(500).json({message: 'Server Error'});
     }
 
-    if (userName === exampleUser.user_name && userPassword === exampleUser.password) {
-        res.json({ success: true, message: "Login successed" });
-    }
-    else {
-        res.status(401).json({success: false, message: "Username or password flase!!!"});
-    }
 }

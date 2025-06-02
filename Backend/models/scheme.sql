@@ -1,0 +1,64 @@
+create database car_db;
+use car_db;
+
+create table Users (
+	userID int auto_increment,
+    username varchar(100) not null unique,
+    password varchar(100) not null,
+    fullname varchar(100) not null,
+    date_of_birth date,
+    phone_number varchar(100) not null,
+    primary key (userID)
+);
+
+create table Brands (
+	brandID int auto_increment,
+    brandname varchar(100) not null,
+    country varchar(100),
+    founded_year int,
+    logo_URL varchar(255),
+    primary key (brandID)
+);
+
+create table Cars (
+	carID int auto_increment,
+    carname varchar(100) not null,
+    license_plate varchar(100) not null unique,
+    year_manufacture int,
+    seats int,
+    fuel_type varchar(100),
+    car_status ENUM('available', 'rented', 'maintenance') default 'available',
+    pickup_location varchar(100),
+	price_per_date double,
+    userID int,
+    brandID int,
+    primary key (carID),
+    foreign key (userID) references Users (userID),
+    foreign key (brandID) references Brands (brandID)
+);
+
+create table Contracts (
+	contractID int auto_increment,
+    rental_start_date date not null,
+    rental_end_date date not null,
+    contract_status ENUM ('pending', 'active', 'completed', 'cancelled') default 'pending',
+    total_price double,
+	userID int not null,
+    carID int not null,
+    primary key (contractID),
+    foreign key (userID) references Users(userID),
+    foreign key (carID) references Cars(carID),
+    constraint chk_dates check (rental_start_date < rental_end_date)
+);
+
+create table Payments (
+	paymentID int auto_increment,
+    payment_date date,
+    payment_method varchar(100),
+    total_price double,
+    payment_status ENUM ('pending', 'completed', 'failed', 'refunded') default 'pending',
+    contractID int not null,
+    primary key (paymentID),
+    foreign key (contractID) references Contracts (contractID)
+);
+
