@@ -62,3 +62,4 @@ create table Payments (
     foreign key (contractID) references Contracts (contractID)
 );
 
+ALTER TABLE Users ADD COLUMN admin BOOLEAN DEFAULT FALSE;

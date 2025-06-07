@@ -1,5 +1,6 @@
 const db = require("../models/db");
 
+// READ
 exports.getCar = async (req, res) => {
     try {
         const [list_car] = await db.execute('SELECT * FROM Cars');
@@ -11,6 +12,7 @@ exports.getCar = async (req, res) => {
     }
 }
 
+// READ DETAILS
 exports.getDetailsCar = async (req, res) => {
     const carID = req.params.id;
     try {
@@ -27,3 +29,21 @@ exports.getDetailsCar = async (req, res) => {
         res.status(500).json({error: 'Server Error'});
     }
 }
+
+// CREATE
+exports.addCar = async (req, res) => {
+    const {carname, license_plate, year_manufacture, seats, fuel_type, pickup_location, price_per_date, brandID} = req.body;
+    const userID = req.user.id;
+
+    try {
+        await db.query('INSERT INTO Cars(carname, license_plate, year_manufacture, seats, fuel_type, pickup_location, price_per_date, userID, brandID) VALUES(?,?,?,?,?,?,?,?,?)',
+            [carname, license_plate, year_manufacture, seats, fuel_type, pickup_location, price_per_date, userID, brandID]
+        );
+
+        res.status(200).json({message: "Add Car Success"});
+    } catch(err) {
+        console.error(err);
+        res.status(500).json({message: "Server Error"});
+    }
+}
+
