@@ -11,7 +11,7 @@ exports.login = async (req, res) => {
         const [rows] = await db.execute('SELECT *FROM Users WHERE username = ?', [username]);
 
         if (rows.length === 0) {
-            return res.status(401).json({message: 'Wrong username'});
+            return res.status(401).json({ message: 'Wrong username' });
         }
 
         const user = rows[0];
@@ -21,10 +21,14 @@ exports.login = async (req, res) => {
             return res.status(404).json({ message: 'Wrong password' });
         }
 
+        if (user.is_active !== 1) {
+            return res.status(403).json({ message: 'Account disabled' });
+        }
+
         const token = jwt.sign(
-            {id: user.userID, username: user.username},
+            { id: user.userID, username: user.username, admin: user.admin },
             'myKey',
-            {expiresIn: '1d'}
+            { expiresIn: '1d' }
         )
 
         res.json({
@@ -41,7 +45,7 @@ exports.login = async (req, res) => {
     }
     catch (err) {
         console.error('Error Login', err);
-        res.status(500).json({message: 'Server Error'});
+        res.status(500).json({ message: 'Server Error' });
     }
 
 }
@@ -49,12 +53,12 @@ exports.login = async (req, res) => {
 // REGISTER
 
 exports.registerUser = async (req, res) => {
-    const {username, password, fullname, date_of_birth, phone_number} = req.body;
-    
+    const { username, password, fullname, date_of_birth, phone_number } = req.body;
+
     try {
         const [existing] = await db.execute('SELECT * FROM Users WHERE username = ?', [username]);
         if (existing.length > 0) {
-            return res.status(404).json({message: "username existing"});
+            return res.status(404).json({ message: "username existing" });
         }
 
         const hashPassword = await bcrypt.hash(password, 10);
@@ -64,10 +68,10 @@ exports.registerUser = async (req, res) => {
             [username, hashPassword, fullname, date_of_birth, phone_number]
         )
 
-        res.status(200).json({message: "User registered successfully"});
+        res.status(200).json({ message: "User registered successfully" });
 
-    } catch(err) {
+    } catch (err) {
         console.error(err);
-        res.status(500).json({message: "Server Error"});
+        res.status(500).json({ message: "Server Error" });
     }
 }
