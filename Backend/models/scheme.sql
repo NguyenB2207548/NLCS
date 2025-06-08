@@ -69,4 +69,7 @@ alter table Cars add column img_URL varchar(255);
 ALTER TABLE Payments
 MODIFY COLUMN payment_date DATETIME DEFAULT CURRENT_TIMESTAMP;
 
+ALTER TABLE Users ADD COLUMN is_active BOOLEAN DEFAULT true;
+
+
 
