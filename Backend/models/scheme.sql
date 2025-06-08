@@ -63,3 +63,10 @@ create table Payments (
 );
 
 ALTER TABLE Users ADD COLUMN admin BOOLEAN DEFAULT FALSE;
+alter table Cars add column img_URL varchar(255);
+
+
+ALTER TABLE Payments
+MODIFY COLUMN payment_date DATETIME DEFAULT CURRENT_TIMESTAMP;
+
+
