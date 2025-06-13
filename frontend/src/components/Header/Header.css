@@ -1,0 +1,11 @@
+.nav-header {
+  --header-text-color: #043c78; 
+  color: var(--header-text-color);
+}
+
+.nav-header .navbar-brand,
+.nav-header .nav-link {
+  color: var(--header-text-color) !important;
+    font-weight: 500;
+    
+}

@@ -1,6 +1,7 @@
 const express = require('express');
 const app = express();
 require('dotenv').config();
+const cors = require('cors');
 const homeRouter = require('./routes/home');
 const authRouter = require('./routes/auth');
 const userRouter = require('./routes/user');
@@ -9,6 +10,7 @@ const rentalRouter = require('./routes/rental');
 const payRouter = require('./routes/pay');
 
 app.use(express.json());
+app.use(cors());
 
 const port = process.env.PORT || 3000;
 
