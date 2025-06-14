@@ -11,6 +11,7 @@ const payRouter = require('./routes/pay');
 
 app.use(express.json());
 app.use(cors());
+app.use('/uploads', express.static('uploads'));
 
 const port = process.env.PORT || 3000;
 

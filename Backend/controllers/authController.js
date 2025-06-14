@@ -11,18 +11,18 @@ exports.login = async (req, res) => {
         const [rows] = await db.execute('SELECT *FROM Users WHERE username = ?', [username]);
 
         if (rows.length === 0) {
-            return res.status(401).json({ message: 'Wrong username' });
+            return res.status(401).json({ message: 'Sai tên đăng nhập' });
         }
 
         const user = rows[0];
 
         const validPassword = await bcrypt.compare(password, user.password);
         if (!validPassword) {
-            return res.status(404).json({ message: 'Wrong password' });
+            return res.status(404).json({ message: 'Sai mật khẩu' });
         }
 
         if (user.is_active !== 1) {
-            return res.status(403).json({ message: 'Account disabled' });
+            return res.status(403).json({ message: 'Tài khoản đang bị vô hiệu hóa' });
         }
 
         const token = jwt.sign(

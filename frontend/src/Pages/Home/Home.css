@@ -1,3 +1,10 @@
 .list-cars {
     background-color: #043c78;
 }
+
+.car-img {
+  height: 250px;       
+  object-fit: cover;       
+  width: 100%;
+  border-radius: 0.5rem 0.5rem 0 0; 
+}

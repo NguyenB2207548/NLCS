@@ -1,0 +1,13 @@
+.footer {
+  font-size: 14px;
+}
+
+.footer ul li {
+  margin-bottom: 8px;
+  cursor: pointer;
+}
+
+.footer ul li:hover {
+  text-decoration: underline;
+  color: #0d6efd;
+}

@@ -1,41 +1,6 @@
 const db = require("../models/db");
 
 // READ
-// exports.getCar = async (req, res) => {
-//     const {seats, brandID, car_status} = req.query;
-
-//     try {
-//         let query = 'SELECT * FROM Cars';
-//         const params = [];
-//         const conditions = [];
-
-//         if (seats) {
-//             conditions.push('seats = ?');
-//             params.push(parseInt(seats));
-//         }
-
-//         if (brandID) {
-//             conditions.push('brandID = ?');
-//             params.push(parseInt(brandID));
-//         }
-
-//         if (car_status) {
-//             conditions.push('car_status = ?');
-//             params.push(car_status);
-//         }
-
-//         if (conditions.length > 0) {
-//             query += ' WHERE ' + conditions.join(' AND ');
-//         }
-
-//         const [list_car] = await db.execute(query, params);
-//         res.status(200).json(list_car);
-
-//     } catch (err) {
-//         console.error(err);
-//         res.status(500).json("Server Error");
-//     }
-// }
 
 exports.getCar = async (req, res) => {
     const { seats, brandID, car_status, username, pickup_location, carname } = req.query;
@@ -62,7 +27,7 @@ exports.getCar = async (req, res) => {
             conditions.push('Cars.car_status = ?');
             params.push(car_status);
         }
-        
+
         if (pickup_location) {
             conditions.push('Cars.pickup_location = ?');
             params.push(pickup_location);
@@ -90,33 +55,39 @@ exports.getCar = async (req, res) => {
     }
 };
 
-
-// READ DETAILS
+// READ DETAIL
 exports.getDetailsCar = async (req, res) => {
     const carID = req.params.id;
     try {
-        const [car] = await db.execute('SELECT *FROM Cars WHERE carID = ?', [carID]);
+        const [rows] = await db.execute(`
+            SELECT C.*, B.brandname, U.fullname AS ownerName, U.phone_number
+            FROM Cars C
+            JOIN Brands B ON C.brandID = B.brandID
+            JOIN Users U ON C.userID = U.userID
+            WHERE C.carID = ?`,
+            [carID]);
 
-        if (car.length === 0) {
+        if (rows.length === 0) {
             return res.status(404).json({ message: 'not found' });
         }
 
-        res.json(car[0]);
+        res.json(rows[0]);
     }
     catch (err) {
         console.error('Error: ', err);
         res.status(500).json({ error: 'Server Error' });
     }
-}
+};
+
 
 // CREATE
 exports.addCar = async (req, res) => {
-    const { carname, license_plate, year_manufacture, seats, fuel_type, pickup_location, price_per_date, brandID } = req.body;
+    const { carname, license_plate, year_manufacture, seats, fuel_type, pickup_location, price_per_date, brandID, img_URL } = req.body;
     const userID = req.user.id;
 
     try {
-        await db.query('INSERT INTO Cars(carname, license_plate, year_manufacture, seats, fuel_type, pickup_location, price_per_date, userID, brandID) VALUES(?,?,?,?,?,?,?,?,?)',
-            [carname, license_plate, year_manufacture, seats, fuel_type, pickup_location, price_per_date, userID, brandID]
+        await db.query('INSERT INTO Cars(carname, license_plate, year_manufacture, seats, fuel_type, pickup_location, price_per_date, userID, brandID, img_URL) VALUES(?,?,?,?,?,?,?,?,?,?)',
+            [carname, license_plate, year_manufacture, seats, fuel_type, pickup_location, price_per_date, userID, brandID, img_URL]
         );
 
         res.status(200).json({ message: "Add Car Success" });
