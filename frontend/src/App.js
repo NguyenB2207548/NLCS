@@ -5,7 +5,8 @@ import Header from './components/Header/Header';
 import Home from './Pages/Home/Home'
 import Footer from './components/Footer/Footer';
 import CarDetail from './Pages/Details/CarDetail';
-
+import AddCar from './Pages/AddCar/AddCar';
+import Profile from './Pages/Profile/Profile';
 
 function App() {
   return (
@@ -18,6 +19,8 @@ function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/car/:id" element={<CarDetail />} /> 
+            <Route path="/car/addCar" element={<AddCar />} />
+            <Route path="/profile" element={<Profile />} />
           </Routes>
       </main>
 

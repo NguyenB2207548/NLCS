@@ -3,12 +3,14 @@ const db = require("../models/db");
 // READ
 
 exports.getCar = async (req, res) => {
-    const { seats, brandID, car_status, username, pickup_location, carname } = req.query;
+    const { seats, brandname, car_status, username, pickup_location, carname } = req.query;
 
     try {
         let query = `
-      SELECT Cars.* FROM Cars
+      SELECT Cars.*
+      FROM Cars
       JOIN Users ON Cars.userID = Users.userID
+      JOIN Brands ON Cars.brandID = Brands.brandID
     `;
         const params = [];
         const conditions = [];
@@ -18,9 +20,9 @@ exports.getCar = async (req, res) => {
             params.push(parseInt(seats));
         }
 
-        if (brandID) {
-            conditions.push('Cars.brandID = ?');
-            params.push(parseInt(brandID));
+        if (brandname) {
+            conditions.push('Brands.brandname = ?');
+            params.push(brandname);
         }
 
         if (car_status) {

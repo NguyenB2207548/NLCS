@@ -13,7 +13,6 @@ const LoginModal = ({ show, handleClose, handleLogin }) => {
     }
 
     handleLogin(username, password);
-
     setUsername('');
     setPassword('');
     setError('');
@@ -22,14 +21,15 @@ const LoginModal = ({ show, handleClose, handleLogin }) => {
 
   return (
     <Modal show={show} onHide={handleClose} centered>
-      <Modal.Header closeButton>
-        <Modal.Title>Đăng nhập</Modal.Title>
+      <Modal.Header closeButton className="border-0 pb-0">
+        <Modal.Title className="w-100 text-center fs-4">Đăng nhập</Modal.Title>
       </Modal.Header>
-      <Modal.Body>
+      <Modal.Body className="px-4">
         {error && <Alert variant="danger">{error}</Alert>}
+
         <Form>
-          <Form.Group controlId="formUsername">
-            <Form.Label>Tên đăng nhập</Form.Label>
+          <Form.Group controlId="formUsername" className="mb-3">
+            <Form.Label className="fw-semibold">Tên đăng nhập</Form.Label>
             <Form.Control
               type="text"
               placeholder="Nhập tên đăng nhập"
@@ -38,8 +38,8 @@ const LoginModal = ({ show, handleClose, handleLogin }) => {
             />
           </Form.Group>
 
-          <Form.Group controlId="formPassword" className="mt-3">
-            <Form.Label>Mật khẩu</Form.Label>
+          <Form.Group controlId="formPassword" className="mb-3">
+            <Form.Label className="fw-semibold">Mật khẩu</Form.Label>
             <Form.Control
               type="password"
               placeholder="Nhập mật khẩu"
@@ -49,7 +49,7 @@ const LoginModal = ({ show, handleClose, handleLogin }) => {
           </Form.Group>
         </Form>
       </Modal.Body>
-      <Modal.Footer>
+      <Modal.Footer className="justify-content-between px-4 pb-4 border-0">
         <Button variant="secondary" onClick={handleClose}>
           Hủy
         </Button>

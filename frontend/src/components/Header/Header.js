@@ -6,7 +6,8 @@ import './Header.css';
 import LoginModal from "../Modal/LoginModal";
 import AccountModal from "../Modal/AccoutModal";
 import RegisterModal from "../Modal/RegisterModal";
-import jwt_decode from 'jwt-decode';
+import { useNavigate } from "react-router-dom";
+
 
 const Header = () => {
     const [showLogin, setShowLogin] = useState(false);
@@ -78,17 +79,32 @@ const Header = () => {
         }
     };
 
+    const navigate = useNavigate();
+
+    const handleAddCarClick = () => {
+        const token = localStorage.getItem('token');
+
+        if (!token) {
+            alert("Bạn cần đăng nhập để đăng xe.");
+            setShowLogin(true);
+        } else {
+            navigate("/car/addCar");
+        }
+    };
+
+
     return (
         <Navbar expand="lg" sticky="top" className="nav-header">
             <Container fluid>
-                <Navbar.Brand as={Link} to="/" className="fw-bold text-primary">
+                <Navbar.Brand as={Link} to="/" state={{ reset: true }} className="fw-bold text-primary">
                     Thuê Xe Tự Lái
                 </Navbar.Brand>
                 <Navbar.Toggle aria-controls="main-navbar-nav" />
                 <Navbar.Collapse id="main-navbar-nav">
                     <Nav className="align-items-center ms-auto">
-                        <Nav.Link as={Link} to="/" className="text-nav">TRANG CHỦ</Nav.Link>
-                        <Nav.Link as={Link} to="/about" className="text-nav">HƯỚNG DẪN ĐẶT XE</Nav.Link>
+                        <Nav.Link as={Link} to="/" state={{ reset: true }} className="text-nav">TRANG CHỦ</Nav.Link>
+
+                        <Nav.Link onClick={handleAddCarClick} className="text-nav">ĐĂNG XE</Nav.Link>
 
                         {isLoggedIn ? (
                             <Dropdown align="end">
@@ -98,7 +114,7 @@ const Header = () => {
                                 </Dropdown.Toggle>
 
                                 <Dropdown.Menu>
-                                    <Dropdown.Item onClick={() => setShowAccount(true)}>Tài khoản của tôi</Dropdown.Item>
+                                    <Dropdown.Item as={Link} to="/profile">Xem hồ sơ</Dropdown.Item>
                                     <Dropdown.Divider />
                                     <Dropdown.Item onClick={handleLogout} className="text-danger">Đăng xuất</Dropdown.Item>
                                 </Dropdown.Menu>

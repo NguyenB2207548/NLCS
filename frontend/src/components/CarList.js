@@ -2,50 +2,56 @@ import React, { useEffect, useState } from 'react';
 import { Row, Col, Card, Button } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 
+const CarList = ({ filters = {} }) => {
+  const [cars, setCars] = useState([]);
 
-const CarList = () => {
-    const [cars, setCars] = useState([]);
+  useEffect(() => {
+    const queryParams = new URLSearchParams();
 
-    useEffect(() => {
-        fetch('http://localhost:3000/car')
-            .then((response) => response.json())
-            .then((data) => setCars(data))
-            .catch((error) => console.error('Fetch error:', error));
-    }, []);
+    if (filters.location) queryParams.append('pickup_location', filters.location);
+    if (filters.seat) queryParams.append('seats', filters.seat);
+    if (filters.brand) queryParams.append('brandname', filters.brand);
+    queryParams.append('car_status', 'available');
 
-    return (
-        <div className="py-4 list-cars">
-            <h2 className="mb-4 fw-bold text-center title-list">Danh sách xe</h2>
-            <Row>
-                {cars.filter((car) => car.car_status === 'available')
-                    .map((car) => (
-                        <Col key={car.carID} xs={12} sm={6} md ={4} lg={3} className="mb-4">
-                            <Card className="h-100 shadow-sm rounded-4">
-                                <Card.Img variant="top" src={`http://localhost:3000${car.img_URL}`} className="car-img" />
-                                <Card.Body>
-                                    <Card.Title>{car.carname}</Card.Title>
-                                    <Card.Text>
-                                        Số ghế: <strong>{car.seats} chỗ</strong>
-                                    </Card.Text>
+    fetch(`http://localhost:3000/car?${queryParams.toString()}`)
+      .then((res) => res.json())
+      .then((data) => setCars(data))
+      .catch((err) => console.error('Lỗi khi gọi API:', err));
+  }, [filters]);
 
-                                    <Card.Text>
-                                        Vị trí: <strong>{car.pickup_location}</strong>
-                                    </Card.Text>
-                                    
-                                    <Card.Text>
-                                        Giá thuê: <strong>{car.price_per_date.toLocaleString()}đ/ngày</strong>
-                                    </Card.Text>
-
-                                    <Button className="w-100 button-xemchitiet" as={Link} to={`/car/${car.carID}`}>Xem chi tiết</Button>
-
-
-                                </Card.Body>
-                            </Card>
-                        </Col>
-                    ))}
-            </Row>
-        </div>
-    );
+  return (
+    <div className="py-4 list-cars">
+      <h2 className="mb-4 fw-bold text-center title-list">Danh sách xe</h2>
+      <Row>
+        {cars.length > 0 ? (
+          cars.map((car) => (
+            <Col key={car.carID} xs={12} sm={6} md={4} lg={3} className="mb-4">
+              <Card className="h-100 shadow-sm rounded-4">
+                <Card.Img variant="top" src={`http://localhost:3000${car.img_URL}`} className="car-img" />
+                <Card.Body>
+                  <Card.Title>{car.carname}</Card.Title>
+                  <Card.Text>
+                    Số ghế: <strong>{car.seats} chỗ</strong>
+                  </Card.Text>
+                  <Card.Text>
+                    Vị trí: <strong>{car.pickup_location}</strong>
+                  </Card.Text>
+                  <Card.Text>
+                    Giá thuê: <strong>{car.price_per_date.toLocaleString()}đ/ngày</strong>
+                  </Card.Text>
+                  <Button className="w-100 button-xemchitiet" as={Link} to={`/car/${car.carID}`}>
+                    Xem chi tiết
+                  </Button>
+                </Card.Body>
+              </Card>
+            </Col>
+          ))
+        ) : (
+          <p className="text-center text-muted">Không tìm thấy xe phù hợp.</p>
+        )}
+      </Row>
+    </div>
+  );
 };
 
 export default CarList;
