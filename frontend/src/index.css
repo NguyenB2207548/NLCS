@@ -5,10 +5,12 @@ body {
     sans-serif; */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  font-family: Exo, sans-serif !important;
+  /* font-family: Exo, sans-serif !important; */
+   font-family: 'Poppins', sans-serif !important;
 
 }
 
 header {
   width: 100%;
 }
+

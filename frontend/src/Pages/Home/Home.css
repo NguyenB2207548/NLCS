@@ -1,5 +1,6 @@
 .list-cars {
-    background-color: #043c78;
+    /* background-color: #043c78; */
+    background-color: #f8f9fa;
 }
 
 .car-img {
@@ -7,4 +8,16 @@
   object-fit: cover;       
   width: 100%;
   border-radius: 0.5rem 0.5rem 0 0; 
+}
+
+.title-list {
+  color: #043c78;
+}
+
+.button-xemchitiet {
+   background-color: #043c78 !important;
+}
+
+.button-timkiem {
+  background-color: #043c78 !important;
 }

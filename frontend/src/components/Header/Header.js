@@ -1,28 +1,30 @@
 import React, { useEffect, useState } from "react";
-import { Navbar, Nav, Container } from 'react-bootstrap';
+import { Navbar, Nav, Container, Dropdown } from 'react-bootstrap';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import { Link } from 'react-router-dom';
-import './Header.css'
+import './Header.css';
 import LoginModal from "../Modal/LoginModal";
 import AccountModal from "../Modal/AccoutModal";
 import RegisterModal from "../Modal/RegisterModal";
-
+import jwt_decode from 'jwt-decode';
 
 const Header = () => {
     const [showLogin, setShowLogin] = useState(false);
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [showAccount, setShowAccount] = useState(false);
     const [showRegister, setShowRegister] = useState(false);
+    const [fullname, setFullname] = useState('');
 
     useEffect(() => {
         const token = localStorage.getItem('token');
         if (token) {
             setIsLoggedIn(true);
+            const user = JSON.parse(localStorage.getItem('user'));
+            setFullname(user?.fullname || '');
         }
-    }, [])
+    }, []);
 
     const handleLogin = (username, password) => {
-
         fetch('http://localhost:3000/auth/login', {
             method: 'POST',
             headers: {
@@ -34,9 +36,11 @@ const Header = () => {
             .then(data => {
                 if (data.token) {
                     localStorage.setItem('token', data.token);
+                    localStorage.setItem('user', JSON.stringify(data.user));
                     alert('Đăng nhập thành công');
                     setIsLoggedIn(true);
                     setShowLogin(false);
+                    setFullname(data.user.fullname);
                 } else {
                     alert(data.message);
                 }
@@ -48,6 +52,7 @@ const Header = () => {
 
     const handleLogout = () => {
         localStorage.removeItem('token');
+        localStorage.removeItem('user');
         setIsLoggedIn(false);
         setShowAccount(false);
     };
@@ -76,34 +81,42 @@ const Header = () => {
     return (
         <Navbar expand="lg" sticky="top" className="nav-header">
             <Container fluid>
-                <Navbar.Brand as={Link} to="/" className="fw-bold">
+                <Navbar.Brand as={Link} to="/" className="fw-bold text-primary">
                     Thuê Xe Tự Lái
                 </Navbar.Brand>
                 <Navbar.Toggle aria-controls="main-navbar-nav" />
                 <Navbar.Collapse id="main-navbar-nav">
-                    <Nav className="ms-auto">
-                        <Nav.Link as={Link} to="/" className="p-3 text-nav">TRANG CHỦ</Nav.Link>
-                        <Nav.Link as={Link} to="/about" className="p-3 text-nav">HƯỚNG DẪN ĐẶT XE</Nav.Link>
+                    <Nav className="align-items-center ms-auto">
+                        <Nav.Link as={Link} to="/" className="text-nav">TRANG CHỦ</Nav.Link>
+                        <Nav.Link as={Link} to="/about" className="text-nav">HƯỚNG DẪN ĐẶT XE</Nav.Link>
 
                         {isLoggedIn ? (
-                            <Nav.Link onClick={() => setShowAccount(true)} className="text-nav">
-                                <i className="bi bi-person-circle icon-login"></i>
-                            </Nav.Link>
+                            <Dropdown align="end">
+                                <Dropdown.Toggle variant="light" className="d-flex align-items-center border-0 bg-transparent">
+                                    <i className="bi bi-person-circle me-2" style={{ fontSize: '1.5rem', color: '#0d3b66' }}></i>
+                                    <span className="fw-semibold text-dark">{fullname}</span>
+                                </Dropdown.Toggle>
+
+                                <Dropdown.Menu>
+                                    <Dropdown.Item onClick={() => setShowAccount(true)}>Tài khoản của tôi</Dropdown.Item>
+                                    <Dropdown.Divider />
+                                    <Dropdown.Item onClick={handleLogout} className="text-danger">Đăng xuất</Dropdown.Item>
+                                </Dropdown.Menu>
+                            </Dropdown>
                         ) : (
                             <>
-                                <Nav.Link onClick={() => setShowLogin(true)} className="p-3 text-nav">Đăng nhập</Nav.Link>
-                                <Nav.Link onClick={() => setShowRegister(true)} className="p-3 text-nav">Đăng ký</Nav.Link>
+                                <Nav.Link onClick={() => setShowLogin(true)} className="text-nav">Đăng nhập</Nav.Link>
+                                <Nav.Link onClick={() => setShowRegister(true)} className="text-nav">Đăng ký</Nav.Link>
                             </>
                         )}
-
                     </Nav>
                 </Navbar.Collapse>
 
                 <LoginModal
                     show={showLogin}
                     handleClose={() => setShowLogin(false)}
-                    handleLogin={handleLogin} />
-
+                    handleLogin={handleLogin}
+                />
 
                 <AccountModal
                     show={showAccount}
@@ -118,9 +131,7 @@ const Header = () => {
                 />
             </Container>
         </Navbar>
-
     );
-
-}
+};
 
 export default Header;
