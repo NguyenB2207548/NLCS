@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { Container, Row, Col, Button } from 'react-bootstrap';
 import { FaPhoneAlt } from 'react-icons/fa';
 import './CarDetail.css';
@@ -20,16 +20,16 @@ const CarDetail = () => {
     <Container className="py-5 border">
       <h2 className="fw-bold mb-3">{car.carname}</h2>
       <div className="mb-3">
-        <span className="badge bg-light text-dark">{car.delivery_option || 'Giao xe tận nơi'}</span>
+        <span className="badge bg-light text-dark">{'Giao xe tận nơi'}</span>
       </div>
 
       <Row>
         <Col md={7}>
           <img
-            src={`http://localhost:3000${car.img_URL}`}
+            src={`http://localhost:3000/uploads/${car.img_URL}`}
             alt={car.carname}
             className="rounded w-100"
-            style={{ maxHeight: '600px', objectFit: 'cover' }} 
+            style={{ maxHeight: '600px', objectFit: 'cover' }}
           />
         </Col>
 
@@ -55,14 +55,16 @@ const CarDetail = () => {
               <Col xs={6}>{car.price_per_date.toLocaleString()}đ/ngày</Col>
             </Row>
 
-            <Button className="w-100 mt-4 mb-3 button-datxe">
-              Đặt xe ngay
-            </Button>
+            <Link to={`/rental/${car.carID}`}>
+              <Button className="w-100 mt-4 mb-3 button-datxe">
+                Đặt xe ngay
+              </Button>
+            </Link>
 
             <div>
               <p className="text-center text-contract">Liên hệ càng sớm càng tốt</p>
             </div>
-            
+
             <div className="bg-light p-3 rounded text-center">
               <FaPhoneAlt className="me-2 icon-phone" />
               <strong className="phone-number">{car.phone_number}</strong>

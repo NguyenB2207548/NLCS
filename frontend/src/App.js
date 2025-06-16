@@ -7,6 +7,7 @@ import Footer from './components/Footer/Footer';
 import CarDetail from './Pages/Details/CarDetail';
 import AddCar from './Pages/AddCar/AddCar';
 import Profile from './Pages/Profile/Profile';
+import CreateRental from './Pages/Rental/Rental';
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
             <Route path="/car/:id" element={<CarDetail />} /> 
             <Route path="/car/addCar" element={<AddCar />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/rental/:id" element={<CreateRental />} />
           </Routes>
       </main>
 

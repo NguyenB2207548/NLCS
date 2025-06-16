@@ -84,20 +84,41 @@ exports.getDetailsCar = async (req, res) => {
 
 // CREATE
 exports.addCar = async (req, res) => {
-    const { carname, license_plate, year_manufacture, seats, fuel_type, pickup_location, price_per_date, brandID, img_URL } = req.body;
+    const {
+        carname,
+        license_plate,
+        year_manufacture,
+        seats,
+        fuel_type,
+        pickup_location,
+        price_per_date,
+        brandID
+    } = req.body;
+
     const userID = req.user.id;
 
+    const img_URL = req.file ? req.file.filename : null;
+
+    if (!img_URL) {
+        return res.status(400).json({ message: 'Ảnh xe là bắt buộc' });
+    }
+
     try {
-        await db.query('INSERT INTO Cars(carname, license_plate, year_manufacture, seats, fuel_type, pickup_location, price_per_date, userID, brandID, img_URL) VALUES(?,?,?,?,?,?,?,?,?,?)',
+        await db.query(
+            'INSERT INTO Cars(carname, license_plate, year_manufacture, seats, fuel_type, pickup_location, price_per_date, userID, brandID, img_URL) VALUES(?,?,?,?,?,?,?,?,?,?)',
             [carname, license_plate, year_manufacture, seats, fuel_type, pickup_location, price_per_date, userID, brandID, img_URL]
         );
 
-        res.status(200).json({ message: "Add Car Success" });
+        res.status(200).json({ message: 'Thêm xe mới thàng công' });
     } catch (err) {
         console.error(err);
-        res.status(500).json({ message: "Server Error" });
+        if (err.code === 'ER_DUP_ENTRY') {
+            return res.status(409).json({ message: 'Biển số xe đã tồn tại' });
+        }
+
+        res.status(500).json({ message: 'Server Error' });
     }
-}
+};
 
 // DELETE
 exports.deleteCar = async (req, res) => {

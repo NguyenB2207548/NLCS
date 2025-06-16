@@ -1,5 +1,6 @@
 const db = require('../models/db');
 
+// Thêm hợp đồng
 exports.createRentalCar = async (req, res) => {
     const userID = req.user.id;
     const carID = req.params.id;
@@ -24,13 +25,13 @@ exports.createRentalCar = async (req, res) => {
             [rental_start_date, rental_end_date, totalPrice, userID, carID]
         )
 
-        res.status(200).json({ message: "Contract created successfully" });
+        res.status(200).json({ message: "Đăng ký thuê xe thành công" });
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: "Server Error" });
     }
 }
-
+// Lấy tất cả hợp đồng
 exports.getContractAll = async (req, res) => {
     try {
         const [list_rental] = await db.execute('SELECT * FROM Contracts');

@@ -8,6 +8,7 @@ const userRouter = require('./routes/user');
 const carRouter = require('./routes/car');
 const rentalRouter = require('./routes/rental');
 const payRouter = require('./routes/pay');
+const brandRouter = require('./routes/brand')
 
 app.use(express.json());
 app.use(cors());
@@ -21,6 +22,7 @@ app.use('/user', userRouter);
 app.use('/car', carRouter);
 app.use('/rental', rentalRouter);
 app.use('/pay', payRouter);
+app.use('/brand', brandRouter);
 
 app.listen(port, () => {
     console.log('Server-running');

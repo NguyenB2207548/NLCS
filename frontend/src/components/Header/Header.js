@@ -1,20 +1,21 @@
 import React, { useEffect, useState } from "react";
 import { Navbar, Nav, Container, Dropdown } from 'react-bootstrap';
 import 'bootstrap-icons/font/bootstrap-icons.css';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import './Header.css';
 import LoginModal from "../Modal/LoginModal";
 import AccountModal from "../Modal/AccoutModal";
 import RegisterModal from "../Modal/RegisterModal";
-import { useNavigate } from "react-router-dom";
-
 
 const Header = () => {
     const [showLogin, setShowLogin] = useState(false);
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem('token'));
     const [showAccount, setShowAccount] = useState(false);
     const [showRegister, setShowRegister] = useState(false);
     const [fullname, setFullname] = useState('');
+    const [loginError, setLoginError] = useState('');
+
+    const navigate = useNavigate();
 
     useEffect(() => {
         const token = localStorage.getItem('token');
@@ -38,16 +39,17 @@ const Header = () => {
                 if (data.token) {
                     localStorage.setItem('token', data.token);
                     localStorage.setItem('user', JSON.stringify(data.user));
-                    alert('Đăng nhập thành công');
                     setIsLoggedIn(true);
                     setShowLogin(false);
+                    setLoginError('');
                     setFullname(data.user.fullname);
                 } else {
-                    alert(data.message);
+                    setLoginError(data.message || 'Đăng nhập thất bại');
                 }
             })
             .catch(err => {
                 console.error('Lỗi đăng nhập:', err);
+                setLoginError('Đã có lỗi xảy ra khi đăng nhập');
             });
     };
 
@@ -71,6 +73,7 @@ const Header = () => {
             if (res.ok) {
                 alert('Đăng ký thành công!');
                 setShowRegister(false);
+                setShowLogin(true);
             } else {
                 alert(data.message || 'Đăng ký thất bại');
             }
@@ -78,8 +81,6 @@ const Header = () => {
             console.error('Lỗi đăng ký:', error);
         }
     };
-
-    const navigate = useNavigate();
 
     const handleAddCarClick = () => {
         const token = localStorage.getItem('token');
@@ -91,7 +92,6 @@ const Header = () => {
             navigate("/car/addCar");
         }
     };
-
 
     return (
         <Navbar expand="lg" sticky="top" className="nav-header">
@@ -121,7 +121,10 @@ const Header = () => {
                             </Dropdown>
                         ) : (
                             <>
-                                <Nav.Link onClick={() => setShowLogin(true)} className="text-nav">Đăng nhập</Nav.Link>
+                                <Nav.Link onClick={() => {
+                                    setShowLogin(true);
+                                    setLoginError('');
+                                }} className="text-nav">Đăng nhập</Nav.Link>
                                 <Nav.Link onClick={() => setShowRegister(true)} className="text-nav">Đăng ký</Nav.Link>
                             </>
                         )}
@@ -130,8 +133,12 @@ const Header = () => {
 
                 <LoginModal
                     show={showLogin}
-                    handleClose={() => setShowLogin(false)}
+                    handleClose={() => {
+                        setShowLogin(false);
+                        setLoginError('');
+                    }}
                     handleLogin={handleLogin}
+                    loginError={loginError}
                 />
 
                 <AccountModal

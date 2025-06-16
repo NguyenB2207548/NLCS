@@ -27,7 +27,7 @@ const CarList = ({ filters = {} }) => {
           cars.map((car) => (
             <Col key={car.carID} xs={12} sm={6} md={4} lg={3} className="mb-4">
               <Card className="h-100 shadow-sm rounded-4">
-                <Card.Img variant="top" src={`http://localhost:3000${car.img_URL}`} className="car-img" />
+                <Card.Img variant="top" src={`http://localhost:3000/uploads/${car.img_URL}`} className="car-img" />
                 <Card.Body>
                   <Card.Title>{car.carname}</Card.Title>
                   <Card.Text>
