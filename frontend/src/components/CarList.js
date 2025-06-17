@@ -39,7 +39,7 @@ const CarList = ({ filters = {} }) => {
                   <Card.Text>
                     Giá thuê: <strong>{car.price_per_date.toLocaleString()}đ/ngày</strong>
                   </Card.Text>
-                  <Button className="w-100 button-xemchitiet" as={Link} to={`/car/${car.carID}`}>
+                  <Button className="w-100 button-xemchitiet" as={Link} to={`/car/detail/${car.carID}`}>
                     Xem chi tiết
                   </Button>
                 </Card.Body>

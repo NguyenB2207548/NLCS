@@ -8,7 +8,7 @@ const CarDetail = () => {
   const [car, setCar] = useState(null);
 
   useEffect(() => {
-    fetch(`http://localhost:3000/car/${id}`)
+    fetch(`http://localhost:3000/car/detail/${id}`)
       .then((res) => res.json())
       .then((data) => setCar(data))
       .catch((err) => console.error('Fetch car error:', err));

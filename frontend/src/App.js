@@ -8,6 +8,7 @@ import CarDetail from './Pages/Details/CarDetail';
 import AddCar from './Pages/AddCar/AddCar';
 import Profile from './Pages/Profile/Profile';
 import CreateRental from './Pages/Rental/Rental';
+import RentalHistory from './Pages/RentalHistory/RentalHistory';
 
 function App() {
   return (
@@ -19,10 +20,12 @@ function App() {
       <main>
           <Routes>
             <Route path="/" element={<Home />} />
-            <Route path="/car/:id" element={<CarDetail />} /> 
+            <Route path="/car/detail/:id" element={<CarDetail />} /> 
             <Route path="/car/addCar" element={<AddCar />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/rental/:id" element={<CreateRental />} />
+            <Route path="/rental/history" element={<RentalHistory />} />
+
           </Routes>
       </main>
 

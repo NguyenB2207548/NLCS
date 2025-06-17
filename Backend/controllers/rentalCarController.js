@@ -45,7 +45,11 @@ exports.getContractOfUser = async (req, res) => {
     const userID = req.user.id;
 
     try {
-        const [list_rental] = await db.execute('SELECT * FROM Contracts WHERE userID = ?', [userID]);
+        const [list_rental] = await db.execute(`SELECT ct.*, c.carname, u.fullname, u.phone_number
+                                                FROM Contracts ct
+                                                JOIN Cars c ON ct.carID = c.carID
+                                                JOIN Users u ON u.userID = c.userID
+                                                WHERE ct.userID = ?`, [userID]);
         res.status(200).json(list_rental);
     } catch (err) {
         console.error(err);
@@ -56,7 +60,8 @@ exports.getContractOfUser = async (req, res) => {
 exports.confirmContract = async (req, res) => {
     const userID = req.user.id;
     const contractID = req.params.id;
-    const contract_status = 'completed';
+    const contract_status = 'active';
+    const car_status = 'rented';
 
     try {
         const [contracts] = await db.execute(`SELECT ct.*
@@ -67,8 +72,16 @@ exports.confirmContract = async (req, res) => {
             return res.status(400).json({ message: "Not found Contract or no owner" });
         }
 
+        const carID = contracts[0].carID;
+
         await db.execute('UPDATE Contracts SET contract_status = ? WHERE contractID = ?', [contract_status, contractID]);
-        res.status(200).json({ message: "Confirm successfully" });
+
+        await db.execute(
+            'UPDATE Cars SET car_status = ? WHERE carID = ?',
+            [car_status, carID]
+        );
+
+        res.status(200).json({ message: "Xác nhận thành công" });
 
     } catch (err) {
         console.error(err);
@@ -76,13 +89,45 @@ exports.confirmContract = async (req, res) => {
     }
 }
 
+exports.rejectContract = async (req, res) => {
+    const userID = req.user.id;
+    const contractID = req.params.id;
+    const contract_status = 'cancelled';
+
+    try {
+        const [contracts] = await db.execute(`
+            SELECT ct.*
+            FROM Contracts ct
+            JOIN Cars c ON ct.carID = c.carID
+            WHERE c.userID = ? AND ct.contractID = ?
+        `, [userID, contractID]);
+
+        if (contracts.length === 0) {
+            return res.status(400).json({ message: "Không tìm thấy hợp đồng hoặc bạn không có quyền" });
+        }
+
+        await db.execute(
+            'UPDATE Contracts SET contract_status = ? WHERE contractID = ?',
+            [contract_status, contractID]
+        );
+
+        res.status(200).json({ message: "Đã từ chối hợp đồng" });
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "Server Error" });
+    }
+};
+
+
 exports.getContractOfOwner = async (req, res) => {
     const ownerID = req.user.id;
 
     try {
-        const [contracts] = await db.execute(`SELECT ct.*
+        const [contracts] = await db.execute(`SELECT ct.*, u.fullname, u.phone_number, c.carname
                                         FROM Contracts ct
                                         JOIN Cars c ON ct.carID = c.carID
+                                        JOIN Users u ON ct.userID = u.userID
                                         WHERE c.userID = ?`, [ownerID]);
         res.status(200).json(contracts);
     } catch (err) {

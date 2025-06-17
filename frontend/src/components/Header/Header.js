@@ -43,6 +43,9 @@ const Header = () => {
                     setShowLogin(false);
                     setLoginError('');
                     setFullname(data.user.fullname);
+
+                    navigate("/", { state: { reset: true } });
+
                 } else {
                     setLoginError(data.message || 'Đăng nhập thất bại');
                 }
@@ -58,6 +61,8 @@ const Header = () => {
         localStorage.removeItem('user');
         setIsLoggedIn(false);
         setShowAccount(false);
+
+        navigate("/", { state: { reset: true } });
     };
 
     const handleRegister = async (formData) => {
@@ -74,6 +79,7 @@ const Header = () => {
                 alert('Đăng ký thành công!');
                 setShowRegister(false);
                 setShowLogin(true);
+
             } else {
                 alert(data.message || 'Đăng ký thất bại');
             }
@@ -115,6 +121,7 @@ const Header = () => {
 
                                 <Dropdown.Menu>
                                     <Dropdown.Item as={Link} to="/profile">Xem hồ sơ</Dropdown.Item>
+                                    <Dropdown.Item as={Link} to="/rental/history">Xem lịch sử thuê</Dropdown.Item>
                                     <Dropdown.Divider />
                                     <Dropdown.Item onClick={handleLogout} className="text-danger">Đăng xuất</Dropdown.Item>
                                 </Dropdown.Menu>

@@ -15,7 +15,7 @@ const CreateRental = () => {
     useEffect(() => {
         const fetchCarInfo = async () => {
             try {
-                const res = await fetch(`http://localhost:3000/car/${carID}`);
+                const res = await fetch(`http://localhost:3000/car/detail/${carID}`);
                 const result = await res.json();
                 if (res.ok) {
                     setCarInfo(result);

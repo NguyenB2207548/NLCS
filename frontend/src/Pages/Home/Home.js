@@ -26,6 +26,9 @@ const Home = () => {
             setSeat('');
             setBrand('');
             setFilters({});
+
+            window.history.replaceState({}, document.title);
+
         }
     }, [locationState]);
 

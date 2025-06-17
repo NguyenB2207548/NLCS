@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Card, Button, Form, Tab, Tabs, Table } from "react-bootstrap";
+import { useNavigate } from 'react-router-dom';
 
 const Profile = () => {
     const [user, setUser] = useState({});
@@ -7,6 +8,40 @@ const Profile = () => {
     const [formData, setFormData] = useState({});
     const [cars, setCars] = useState([]);
     const [contracts, setContracts] = useState([]);
+
+    const navigate = useNavigate();
+
+
+    const fetchContracts = () => {
+        const token = localStorage.getItem('token');
+        fetch(`http://localhost:3000/rental/getContractOwner`, {
+            method: 'GET',
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        })
+            .then((res) => res.json())
+            .then((data) => {
+                setContracts(data);
+            })
+            .catch((err) => console.error('Lỗi khi gọi API:', err));
+    };
+
+    const fetchCars = () => {
+        const token = localStorage.getItem('token');
+        fetch(`http://localhost:3000/car/getAllCarOfUser`, {
+            method: 'GET',
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        })
+            .then((res) => res.json())
+            .then((data) => {
+                setCars(data);
+            })
+            .catch((err) => console.error('Lỗi khi gọi API:', err));
+    };
+
 
     useEffect(() => {
         // Giả lập fetch API
@@ -18,17 +53,9 @@ const Profile = () => {
         setUser(mockUser);
         setFormData(mockUser);
 
-        // Giả lập danh sách xe
-        setCars([
-            { id: 1, name: "Toyota Vios", license: "51A-12345", seat: 5, location: "Hồ Chí Minh", status: "Hoạt động" },
-            { id: 2, name: "Kia Morning", license: "30G-67890", seat: 4, location: "Hà Nội", status: "Đang bảo trì" }
-        ]);
+        fetchCars();
+        fetchContracts();
 
-        // Giả lập hợp đồng
-        setContracts([
-            { id: 1, renter: "Nguyen Van A", car: "Toyota Vios", from: "2025-06-01", to: "2025-06-03", total: "2.000.000đ", status: "Đã xác nhận" },
-            { id: 2, renter: "Tran Thi B", car: "Kia Morning", from: "2025-06-10", to: "2025-06-12", total: "1.800.000đ", status: "Chờ xác nhận" }
-        ]);
     }, []);
 
     const handleChange = (e) => {
@@ -41,6 +68,42 @@ const Profile = () => {
         setEditing(false);
         setUser(formData);
     };
+
+    const handleApprove = (id) => {
+        const token = localStorage.getItem('token');
+
+        fetch(`http://localhost:3000/rental/confirm/${id}`, {
+            method: 'POST',
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        })
+            .then((res) => res.json())
+            .then((data) => {
+                alert(data.message);
+                fetchContracts();
+            })
+            .catch((err) => console.error('Lỗi khi gọi API:', err));
+
+    }
+
+    const handleReject = (id) => {
+        const token = localStorage.getItem('token');
+
+        fetch(`http://localhost:3000/rental/reject/${id}`, {
+            method: 'POST',
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        })
+            .then((res) => res.json())
+            .then((data) => {
+                alert(data.message);
+                fetchContracts();
+            })
+            .catch((err) => console.error('Lỗi khi gọi API:', err));
+
+    }
 
     return (
         <Card className="p-4 shadow-sm w-75 mx-auto mt-4">
@@ -100,18 +163,24 @@ const Profile = () => {
                                 <th>Biển số</th>
                                 <th>Số chỗ</th>
                                 <th>Vị trí</th>
+                                <th>Năm sản xuất</th>
+                                <th>Loại nhiên liệu</th>
+                                <th>Giá thuê</th>
                                 <th>Trạng thái</th>
                                 <th>Hành động</th>
                             </tr>
                         </thead>
                         <tbody>
                             {cars.map(car => (
-                                <tr key={car.id}>
-                                    <td>{car.name}</td>
-                                    <td>{car.license}</td>
-                                    <td>{car.seat}</td>
-                                    <td>{car.location}</td>
-                                    <td>{car.status}</td>
+                                <tr key={car.carID}>
+                                    <td>{car.carname}</td>
+                                    <td>{car.license_plate}</td>
+                                    <td>{car.seats}</td>
+                                    <td>{car.pickup_location}</td>
+                                    <td>{car.year_manufacture}</td>
+                                    <td>{car.fuel_type}</td>
+                                    <td>{car.price_per_date}</td>
+                                    <td>{car.car_status}</td>
                                     <td>
                                         <Button variant="outline-primary" size="sm">Sửa</Button>{' '}
                                         <Button variant="outline-danger" size="sm">Xóa</Button>
@@ -120,9 +189,11 @@ const Profile = () => {
                             ))}
                         </tbody>
                     </Table>
+
                     <div className="text-center">
-                        <Button>Thêm xe mới</Button>
+                        <Button onClick={() => navigate('/car/addCar')}>Thêm xe mới</Button>
                     </div>
+
                 </Tab>
 
                 <Tab eventKey="contracts" title="Hợp đồng thuê xe">
@@ -130,26 +201,64 @@ const Profile = () => {
                         <thead>
                             <tr>
                                 <th>Người thuê</th>
+                                <th>Liên hệ</th>
                                 <th>Tên xe</th>
                                 <th>Ngày bắt đầu</th>
                                 <th>Ngày kết thúc</th>
                                 <th>Tổng tiền</th>
-                                <th>Trạng thái</th>
+                                {/* <th>Trạng thái</th> */}
+                                <th>Hành động</th>
                             </tr>
                         </thead>
                         <tbody>
                             {contracts.map(contract => (
-                                <tr key={contract.id}>
-                                    <td>{contract.renter}</td>
-                                    <td>{contract.car}</td>
-                                    <td>{contract.from}</td>
-                                    <td>{contract.to}</td>
-                                    <td>{contract.total}</td>
-                                    <td>{contract.status}</td>
+                                <tr key={contract.contractID}>
+                                    <td>{contract.fullname}</td>
+                                    <td>{contract.phone_number}</td>
+                                    <td>{contract.carname}</td>
+                                    <td>{new Date(contract.rental_start_date).toLocaleDateString()}</td>
+                                    <td>{new Date(contract.rental_end_date).toLocaleDateString()}</td>
+                                    <td>{contract.total_price.toLocaleString()}</td>
+                                    {/* <td>{contract.contract_status}</td> */}
+
+                                    <td>
+                                        {contract.contract_status === 'pending' ? (
+                                            <>
+                                                <Button
+                                                    variant="success"
+                                                    size="sm"
+                                                    onClick={() => handleApprove(contract.contractID)}
+                                                >
+                                                    Duyệt
+                                                </Button>{' '}
+                                                <Button
+                                                    variant="danger"
+                                                    size="sm"
+                                                    onClick={() => handleReject(contract.contractID)}
+                                                >
+                                                    Từ chối
+                                                </Button>
+                                            </>
+                                        ) : (
+                                            <>
+                                                {contract.contract_status === 'active' && (
+                                                    <span className="text-success">Đã duyệt</span>
+                                                )}
+                                                {contract.contract_status === 'cancelled' && (
+                                                    <span className="text-danger">Đã từ chối</span>
+                                                )}
+                                                {contract.contract_status === 'completed' && (
+                                                    <span className="text-secondary">Đã hoàn thành</span>
+                                                )}
+                                            </>
+                                        )}
+                                    </td>
+
                                 </tr>
                             ))}
                         </tbody>
                     </Table>
+
                 </Tab>
             </Tabs>
         </Card>

@@ -81,6 +81,26 @@ exports.getDetailsCar = async (req, res) => {
     }
 };
 
+// READ ALL CARS OF USER
+exports.getAllCarOfUser = async (req, res) => {
+    const userID = req.user.id;
+
+    try {
+        const [rows] = await db.execute(`SELECT * FROM Cars WHERE userID = ?`, [userID]);
+
+        if (rows.length === 0) {
+            return res.status(404).json({ message: 'Danh sách trống' });
+        }
+
+        res.json(rows);
+    }
+    catch (err) {
+        console.error('Error: ', err);
+        res.status(500).json({ error: 'Server Error' });
+    }
+};
+
+
 
 // CREATE
 exports.addCar = async (req, res) => {
