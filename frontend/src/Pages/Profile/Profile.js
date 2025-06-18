@@ -3,16 +3,17 @@ import { Card, Button, Form, Tab, Tabs, Table } from "react-bootstrap";
 import { useNavigate } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
 import EditUserModal from '../../components/Modal/EditUserModal'
+import EditCarModal from "../../components/Modal/EditCarModal";
 
 const Profile = () => {
     const [formData, setFormData] = useState({});
     const [cars, setCars] = useState([]);
     const [contracts, setContracts] = useState([]);
     const [showEditModal, setShowEditModal] = useState(false);
-
+    const [showEditCarModal, setShowEditCarModal] = useState(false);
+    const [selectedCar, setSelectedCar] = useState(null);
 
     const navigate = useNavigate();
-
 
     const fetchContracts = () => {
         const token = localStorage.getItem('token');
@@ -157,8 +158,12 @@ const Profile = () => {
         })
             .then(res => res.json())
             .then(data => {
-                alert(data.message);
-                fetchCars();
+                if (data.message !== 'Xóa thành công')
+                    alert(data.message);
+                else {
+                    setCars(prev => prev.filter(item => item.carID !== carID));
+                }
+                // fetchCars();
             })
             .catch(err => {
                 console.error('Lỗi khi xóa xe:', err);
@@ -250,7 +255,11 @@ const Profile = () => {
                                                 car.car_status}
                                     </td>
                                     <td>
-                                        <Button variant="outline-primary" size="sm">Sửa</Button>{' '}
+                                        <Button className="m-1" variant="outline-primary" size="sm" onClick={() => {
+                                            setSelectedCar(car);
+                                            setShowEditCarModal(true);
+                                        }}>Sửa</Button>
+
                                         <Button
                                             variant="outline-danger"
                                             size="sm"
@@ -281,7 +290,7 @@ const Profile = () => {
                                 <th>Ngày bắt đầu</th>
                                 <th>Ngày kết thúc</th>
                                 <th>Tổng tiền</th>
-                                {/* <th>Trạng thái</th> */}
+                                <th>Trạng thái</th>
                                 <th>Hành động</th>
                             </tr>
                         </thead>
@@ -294,7 +303,7 @@ const Profile = () => {
                                     <td>{new Date(contract.rental_start_date).toLocaleDateString()}</td>
                                     <td>{new Date(contract.rental_end_date).toLocaleDateString()}</td>
                                     <td>{contract.total_price.toLocaleString()}</td>
-                                    {/* <td>{contract.contract_status}</td> */}
+                                    <td>{contract.contract_status}</td>
 
                                     <td>
                                         {contract.contract_status === 'pending' ? (
@@ -344,6 +353,14 @@ const Profile = () => {
                 handleChange={handleChange}
                 handleSave={handleSave}
             />
+
+            <EditCarModal
+                show={showEditCarModal}
+                handleClose={() => setShowEditCarModal(false)}
+                carData={selectedCar}
+                onSave={fetchCars}
+            />
+
 
         </Card>
 

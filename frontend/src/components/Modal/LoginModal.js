@@ -14,7 +14,9 @@ const LoginModal = ({ show, handleClose, handleLogin, loginError }) => {
     }
   }, [show]);
 
-  const submitHandler = () => {
+  const submitHandler = (e) => {
+    e.preventDefault(); // Ngăn form reload trang
+
     if (!username || !password) {
       setLocalError('Vui lòng nhập đầy đủ thông tin!');
       return;
@@ -37,7 +39,7 @@ const LoginModal = ({ show, handleClose, handleLogin, loginError }) => {
           </Alert>
         )}
 
-        <Form>
+        <Form onSubmit={submitHandler}>
           <Form.Group controlId="formUsername" className="mb-3">
             <Form.Label className="fw-semibold">Tên đăng nhập</Form.Label>
             <Form.Control
@@ -58,21 +60,21 @@ const LoginModal = ({ show, handleClose, handleLogin, loginError }) => {
               onChange={(e) => setPassword(e.target.value)}
             />
           </Form.Group>
+
+          <div className="d-flex justify-content-between pt-2">
+            <Button variant="secondary" onClick={handleClose}>
+              Hủy
+            </Button>
+            <Button
+              variant="primary"
+              type="submit"
+              style={{ minWidth: '100px' }}
+            >
+              Đăng nhập
+            </Button>
+          </div>
         </Form>
       </Modal.Body>
-
-      <Modal.Footer className="justify-content-between px-4 pb-4 border-0">
-        <Button variant="secondary" onClick={handleClose}>
-          Hủy
-        </Button>
-        <Button
-          variant="primary"
-          onClick={submitHandler}
-          style={{ minWidth: '100px' }}
-        >
-          Đăng nhập
-        </Button>
-      </Modal.Footer>
     </Modal>
   );
 };

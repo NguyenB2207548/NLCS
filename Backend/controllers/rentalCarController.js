@@ -41,6 +41,19 @@ exports.getContractAll = async (req, res) => {
     }
 }
 
+// Hủy hợp đồng khi chưa được xác nhận
+exports.cancelContract = async (req, res) => {
+    const id = req.params.id;
+
+    try {
+        await db.execute('DELETE FROM Contracts WHERE contractID = ?', [id]);
+        res.status(200).json({message: "Hủy thành công"})
+    } catch (err) {
+        res.status(500).json({ mesage: "Server Error" })
+    }
+}
+
+
 exports.getContractOfUser = async (req, res) => {
     const userID = req.user.id;
 
@@ -135,3 +148,15 @@ exports.getContractOfOwner = async (req, res) => {
         res.status(500).json({ message: "Server Error" });
     }
 }
+
+exports.softDeleteContract = async (req, res) => {
+    const id = req.params.id;
+
+    try {
+        await db.execute("UPDATE Contracts SET is_deleted = TRUE WHERE contractID = ?", [id]);
+        res.json({ message: 'Xóa thành công' });
+    } catch (err) {
+        console.error("Lỗi khi xóa hợp đồng:", err);
+        res.status(500).json({ message: 'Lỗi server.' });
+    }
+};

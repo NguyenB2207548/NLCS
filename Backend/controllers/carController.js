@@ -159,15 +159,16 @@ exports.deleteCar = async (req, res) => {
             [carID]
         );
 
-            const hasUncompleted = contracts.some(
-                contract => contract.contract_status !== 'completed'
-            );
-            if (hasUncompleted) {
-                return res.status(400).json({ message: "Xe đang có hợp đồng chưa hoàn thành" });
-            }
+        const hasUncompleted = contracts.some(
+            contract => contract.contract_status !== 'completed' && contract.contract_status !== 'cancelled'
+        );
+
+        if (hasUncompleted) {
+            return res.status(400).json({ message: "Xe đang có hợp đồng chưa hoàn thành" });
+        }
 
         await db.execute('DELETE FROM Cars WHERE carID = ?', [carID]);
-        res.status(200).json({ message: "Xóa xe thành công" });
+        res.status(200).json({ message: "Xóa thành công" });
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: "Lỗi máy chủ" });
@@ -192,7 +193,7 @@ exports.updateCar = async (req, res) => {
             WHERE carID=? and userID=?`,
             [carname, license_plate, year_manufacture, seats, fuel_type, car_status, pickup_location, price_per_date, brandID, carID, userID]);
 
-        res.status(200).json({ message: "Updated successfully" });
+        res.status(200).json({ message: "Chỉnh sửa thành công" });
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: "Server Error" });

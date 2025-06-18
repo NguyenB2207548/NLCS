@@ -9,6 +9,21 @@ const Home = () => {
     const [seat, setSeat] = useState('');
     const [brand, setBrand] = useState('');
     const [filters, setFilters] = useState({});
+    const [brands, setBrands] = useState([]);
+
+    useEffect(() => {
+        const fetchBrands = async () => {
+            try {
+                const res = await fetch('http://localhost:3000/brand/getAll');
+                const data = await res.json();
+                setBrands(data);
+            } catch (error) {
+                console.error('Lỗi khi lấy danh sách hãng xe:', error);
+            }
+        };
+
+        fetchBrands();
+    }, []);
 
     const handleSearch = () => {
         setFilters({
@@ -46,6 +61,7 @@ const Home = () => {
                     <option value="Hồ Chí Minh">Hồ Chí Minh</option>
                     <option value="Hà Nội">Hà Nội</option>
                     <option value="Đà Nẵng">Đà Nẵng</option>
+                    <option value="Cần Thơ">Cần Thơ</option>
                 </Form.Select>
 
                 <Form.Select
@@ -59,8 +75,9 @@ const Home = () => {
                     <option value="4">4 chỗ</option>
                     <option value="5">5 chỗ</option>
                     <option value="7">7 chỗ</option>
+                    <option value="9">9 chỗ</option>
+                    <option value="16">16 chỗ</option>
                 </Form.Select>
-
                 <Form.Select
                     className="select-filter"
                     aria-label="Hãng xe"
@@ -69,10 +86,13 @@ const Home = () => {
                     value={brand}
                 >
                     <option value="">Tất cả hãng</option>
-                    <option value="Toyota">Toyota</option>
-                    <option value="BMW">BMW</option>
-                    <option value="Kia">Kia</option>
+                    {brands.map((b) => (
+                        <option key={b.brandID} value={b.brandname}>
+                            {b.brandname}
+                        </option>
+                    ))}
                 </Form.Select>
+
 
                 <Button className="button-timkiem" onClick={handleSearch}>
                     Tìm kiếm

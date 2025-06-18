@@ -12,7 +12,7 @@ exports.payContract = async (req, res) => {
             return res.status(400).json({ message: "Not found contract or no renter" });
         }
 
-        if (contract[0].contract_status !== 'completed') {
+        if (contract[0].contract_status !== 'active') {
             return res.status(400).json({ message: "Contract is not confirm" });
         }
 
@@ -27,6 +27,18 @@ exports.payContract = async (req, res) => {
 
         await db.execute(`INSERT INTO Payments(payment_method, total_price, payment_status, contractID)
             VALUES(?, ?, ?, ?)`, [payment_method, amount, payment_status, contractID]);
+
+        await db.execute(
+            `UPDATE Contracts SET contract_status = 'completed' WHERE contractID = ?`,
+            [contractID]
+        );
+
+        const carID = contract[0].carID;
+        await db.execute(
+            `UPDATE Cars SET contract_status = 'available' WHERE carID = ?`,
+            [carID]
+        );
+
 
         res.status(200).json({ message: "Pay successfully" });
     } catch (err) {

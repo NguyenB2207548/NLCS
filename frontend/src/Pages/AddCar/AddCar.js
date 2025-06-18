@@ -121,6 +121,8 @@ const AddCar = () => {
                             <option value="4">4 chỗ</option>
                             <option value="5">5 chỗ</option>
                             <option value="7">7 chỗ</option>
+                            <option value="9">9 chỗ</option>
+                            <option value="16">16 chỗ</option>
                         </Form.Select>
                     </Col>
                     <Col>

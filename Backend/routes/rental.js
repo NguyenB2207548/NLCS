@@ -9,5 +9,7 @@ router.get('/getOfUser', auth, rentalCarController.getContractOfUser);
 router.post('/confirm/:id', auth, rentalCarController.confirmContract);
 router.post('/reject/:id', auth, rentalCarController.rejectContract);
 router.get('/getContractOwner', auth, rentalCarController.getContractOfOwner);
+router.delete('/deleteContract/:id', auth, rentalCarController.softDeleteContract);
+router.delete('/cancelContract/:id', auth, rentalCarController.cancelContract);
 
 module.exports = router;
