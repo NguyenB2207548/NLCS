@@ -1,13 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { Card, Button, Form, Tab, Tabs, Table } from "react-bootstrap";
 import { useNavigate } from 'react-router-dom';
+import { jwtDecode } from 'jwt-decode';
+import EditUserModal from '../../components/Modal/EditUserModal'
 
 const Profile = () => {
-    const [user, setUser] = useState({});
-    const [editing, setEditing] = useState(false);
     const [formData, setFormData] = useState({});
     const [cars, setCars] = useState([]);
     const [contracts, setContracts] = useState([]);
+    const [showEditModal, setShowEditModal] = useState(false);
+
 
     const navigate = useNavigate();
 
@@ -42,20 +44,35 @@ const Profile = () => {
             .catch((err) => console.error('Lỗi khi gọi API:', err));
     };
 
+    const fetchUser = () => {
+        const token = localStorage.getItem('token');
+
+        const decode = jwtDecode(token);
+        const id = decode.id;
+
+        fetch(`http://localhost:3000/user/${id}`, {
+            method: 'GET',
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        })
+            .then((res) => res.json())
+            .then((data) => {
+                const formattedData = {
+                    ...data,
+                    date_of_birth: data.date_of_birth?.split('T')[0] || '', // chỉ lấy yyyy-MM-dd
+                };
+                setFormData(formattedData);
+            })
+            .catch((err) => console.error('Lỗi khi gọi API:', err));
+
+    };
+
 
     useEffect(() => {
-        // Giả lập fetch API
-        const mockUser = {
-            fullname: "Chi Nguyen",
-            phone_number: "0987654321",
-            email: "chi@example.com"
-        };
-        setUser(mockUser);
-        setFormData(mockUser);
-
         fetchCars();
         fetchContracts();
-
+        fetchUser();
     }, []);
 
     const handleChange = (e) => {
@@ -64,10 +81,31 @@ const Profile = () => {
     };
 
     const handleSave = () => {
-        alert("Cập nhật thành công!");
-        setEditing(false);
-        setUser(formData);
+        const token = localStorage.getItem('token');
+
+        fetch(`http://localhost:3000/user/update`, {
+            method: 'PUT',
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`
+            },
+            body: JSON.stringify(formData)
+        })
+            .then(res => res.json())
+            .then(data => {
+                if (data.message === 'Chỉnh sửa thành công') {
+                    alert('Cập nhật thành công');
+                    setShowEditModal(false);
+                } else {
+                    alert('Cập nhật thất bại: ' + (data.message || 'Đã có lỗi xảy ra'));
+                }
+            })
+            .catch(err => {
+                console.error('Lỗi khi cập nhật:', err);
+                alert('Lỗi khi cập nhật thông tin');
+            });
     };
+
 
     const handleApprove = (id) => {
         const token = localStorage.getItem('token');
@@ -102,8 +140,32 @@ const Profile = () => {
                 fetchContracts();
             })
             .catch((err) => console.error('Lỗi khi gọi API:', err));
-
     }
+
+    // CAR
+
+    const handleDelete = (carID) => {
+        if (!window.confirm("Bạn có chắc muốn xóa xe này?")) return;
+
+        const token = localStorage.getItem('token');
+
+        fetch(`http://localhost:3000/car/${carID}`, {
+            method: 'DELETE',
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        })
+            .then(res => res.json())
+            .then(data => {
+                alert(data.message);
+                fetchCars();
+            })
+            .catch(err => {
+                console.error('Lỗi khi xóa xe:', err);
+                alert('Lỗi khi xóa xe');
+            });
+    };
+
 
     return (
         <Card className="p-4 shadow-sm w-75 mx-auto mt-4">
@@ -119,7 +181,7 @@ const Profile = () => {
                                 name="fullname"
                                 value={formData.fullname || ''}
                                 onChange={handleChange}
-                                readOnly={!editing}
+                                readOnly={!showEditModal}
                             />
                         </Form.Group>
 
@@ -130,24 +192,26 @@ const Profile = () => {
                                 name="phone_number"
                                 value={formData.phone_number || ''}
                                 onChange={handleChange}
-                                readOnly={!editing}
+                                readOnly={!showEditModal}
                             />
                         </Form.Group>
 
                         <Form.Group className="mb-3">
-                            <Form.Label>Email</Form.Label>
+                            <Form.Label>Ngày sinh</Form.Label>
                             <Form.Control
-                                type="email"
-                                name="email"
-                                value={formData.email || ''}
+                                type="date"
+                                name="date_of_birth"
+                                value={formData.date_of_birth || ''}
                                 onChange={handleChange}
-                                readOnly={!editing}
+                                readOnly={!showEditModal}
                             />
                         </Form.Group>
 
+
+
                         <div className="text-center">
-                            {!editing ? (
-                                <Button onClick={() => setEditing(true)}>Chỉnh sửa</Button>
+                            {!showEditModal ? (
+                                <Button onClick={() => setShowEditModal(true)}>Chỉnh sửa</Button>
                             ) : (
                                 <Button onClick={handleSave}>Lưu thay đổi</Button>
                             )}
@@ -180,10 +244,21 @@ const Profile = () => {
                                     <td>{car.year_manufacture}</td>
                                     <td>{car.fuel_type}</td>
                                     <td>{car.price_per_date}</td>
-                                    <td>{car.car_status}</td>
+                                    <td>
+                                        {car.car_status === 'available' ? 'Sẵn sàng' :
+                                            car.car_status === 'rented' ? 'Đang thuê' :
+                                                car.car_status}
+                                    </td>
                                     <td>
                                         <Button variant="outline-primary" size="sm">Sửa</Button>{' '}
-                                        <Button variant="outline-danger" size="sm">Xóa</Button>
+                                        <Button
+                                            variant="outline-danger"
+                                            size="sm"
+                                            onClick={() => handleDelete(car.carID)}
+                                        >
+                                            Xóa
+                                        </Button>
+
                                     </td>
                                 </tr>
                             ))}
@@ -248,7 +323,7 @@ const Profile = () => {
                                                     <span className="text-danger">Đã từ chối</span>
                                                 )}
                                                 {contract.contract_status === 'completed' && (
-                                                    <span className="text-secondary">Đã hoàn thành</span>
+                                                    <span className="text-secondary">Đã thanh toán</span>
                                                 )}
                                             </>
                                         )}
@@ -261,7 +336,18 @@ const Profile = () => {
 
                 </Tab>
             </Tabs>
+
+            <EditUserModal
+                show={showEditModal}
+                handleClose={() => setShowEditModal(false)}
+                formData={formData}
+                handleChange={handleChange}
+                handleSave={handleSave}
+            />
+
         </Card>
+
+
     );
 };
 

@@ -7,7 +7,6 @@ const upload = require('../middleware/upload');
 router.get('/', carController.getCar);
 router.get('/getAllCarOfUser', auth, carController.getAllCarOfUser);
 router.get('/detail/:id', carController.getDetailsCar);
-
 router.post('/addCar', auth, upload.single('image'), carController.addCar);
 router.delete('/:id', auth, carController.deleteCar);
 router.put('/:id', auth, carController.updateCar);

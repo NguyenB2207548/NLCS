@@ -146,18 +146,33 @@ exports.deleteCar = async (req, res) => {
     const carID = req.params.id;
 
     try {
-        const [existing] = await db.execute('SELECT * FROM Cars WHERE carID = ? and userID = ?', [carID, userID]);
+        const [existing] = await db.execute(
+            'SELECT * FROM Cars WHERE carID = ? AND userID = ?',
+            [carID, userID]
+        );
         if (existing.length === 0) {
-            return res.status(404).json({ message: "Find not car or no owner" });
+            return res.status(404).json({ message: "Không tìm thấy xe hoặc bạn không phải chủ xe" });
         }
 
-        await db.query('DELETE FROM Cars WHERE carID = ?', [carID]);
-        res.status(200).json({ message: "Deleted successfully" });
+        const [contracts] = await db.execute(
+            'SELECT * FROM Contracts WHERE carID = ?',
+            [carID]
+        );
+
+            const hasUncompleted = contracts.some(
+                contract => contract.contract_status !== 'completed'
+            );
+            if (hasUncompleted) {
+                return res.status(400).json({ message: "Xe đang có hợp đồng chưa hoàn thành" });
+            }
+
+        await db.execute('DELETE FROM Cars WHERE carID = ?', [carID]);
+        res.status(200).json({ message: "Xóa xe thành công" });
     } catch (err) {
         console.error(err);
-        res.status(500).json({ message: "Server Error" });
+        res.status(500).json({ message: "Lỗi máy chủ" });
     }
-}
+};
 
 // UPDATE
 exports.updateCar = async (req, res) => {
