@@ -39,7 +39,8 @@ exports.login = async (req, res) => {
                 username: user.username,
                 fullname: user.fullname,
                 date_of_birth: user.date_of_birth,
-                phone_number: user.phone_number
+                phone_number: user.phone_number,
+                admin: user.admin
             }
         })
     }

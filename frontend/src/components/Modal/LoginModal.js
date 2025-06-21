@@ -27,7 +27,7 @@ const LoginModal = ({ show, handleClose, handleLogin, loginError }) => {
   };
 
   return (
-    <Modal show={show} onHide={handleClose} centered>
+    <Modal show={show} onHide={handleClose} centered> 
       <Modal.Header closeButton className="border-0 pb-1">
         <Modal.Title className="w-100 text-center fs-4">Đăng nhập</Modal.Title>
       </Modal.Header>

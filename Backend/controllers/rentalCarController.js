@@ -8,29 +8,49 @@ exports.createRentalCar = async (req, res) => {
 
     const startDate = new Date(rental_start_date);
     const endDate = new Date(rental_end_date);
+
     const rentalDays = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
     if (rentalDays <= 0) {
         return res.status(400).json({ message: "Ngày thuê không hợp lệ" });
     }
 
     try {
+        // 1. Kiểm tra xe có tồn tại không
         const [cars] = await db.execute('SELECT * FROM Cars WHERE carID = ?', [carID]);
         if (cars.length === 0) {
-            return res.status(404).json({ message: "Not found Car" });
+            return res.status(404).json({ message: "Không tìm thấy xe" });
         }
+
+        // 2. Kiểm tra xem xe đã được đặt trong thời gian này chưa
+        const [overlapContracts] = await db.execute(`
+            SELECT * FROM Contracts
+            WHERE carID = ?
+              AND contract_status IN ('pending', 'active')
+              AND NOT (rental_end_date < ? OR rental_start_date > ?)
+        `, [carID, rental_start_date, rental_end_date]);
+
+        if (overlapContracts.length > 0) {
+            return res.status(400).json({ message: "Xe đã được đặt trong khoảng thời gian này" });
+        }
+
+        // 3. Tính tổng tiền và tạo hợp đồng
         const pricePerDay = cars[0].price_per_date;
         const totalPrice = rentalDays * pricePerDay;
 
-        await db.execute('INSERT INTO Contracts(rental_start_date, rental_end_date, total_price, userID, carID) VALUES(?,?,?,?,?)',
+        await db.execute(
+            `INSERT INTO Contracts (rental_start_date, rental_end_date, total_price, userID, carID)
+             VALUES (?, ?, ?, ?, ?)`,
             [rental_start_date, rental_end_date, totalPrice, userID, carID]
-        )
+        );
 
         res.status(200).json({ message: "Đăng ký thuê xe thành công" });
+
     } catch (err) {
         console.error(err);
-        res.status(500).json({ message: "Server Error" });
+        res.status(500).json({ message: "Lỗi server khi tạo hợp đồng thuê" });
     }
-}
+};
+
 // Lấy tất cả hợp đồng
 exports.getContractAll = async (req, res) => {
     try {
@@ -47,7 +67,7 @@ exports.cancelContract = async (req, res) => {
 
     try {
         await db.execute('DELETE FROM Contracts WHERE contractID = ?', [id]);
-        res.status(200).json({message: "Hủy thành công"})
+        res.status(200).json({ message: "Hủy thành công" })
     } catch (err) {
         res.status(500).json({ mesage: "Server Error" })
     }

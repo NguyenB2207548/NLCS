@@ -40,8 +40,13 @@ const Profile = () => {
         })
             .then((res) => res.json())
             .then((data) => {
-                setCars(data);
+                if (Array.isArray(data)) {
+                    setCars(data);
+                } else {
+                    setCars([]); // hoặc hiển thị thông báo không có xe
+                }
             })
+
             .catch((err) => console.error('Lỗi khi gọi API:', err));
     };
 

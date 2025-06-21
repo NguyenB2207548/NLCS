@@ -8,7 +8,10 @@ const userRouter = require('./routes/user');
 const carRouter = require('./routes/car');
 const rentalRouter = require('./routes/rental');
 const payRouter = require('./routes/pay');
-const brandRouter = require('./routes/brand')
+const brandRouter = require('./routes/brand');
+const adminUser = require('./routes/admin/adminUser');
+const adminCar = require('./routes/admin/adminCar');
+const adminContract = require('./routes/admin/adminContract');
 
 app.use(express.json());
 app.use(cors());
@@ -23,6 +26,9 @@ app.use('/car', carRouter);
 app.use('/rental', rentalRouter);
 app.use('/pay', payRouter);
 app.use('/brand', brandRouter);
+app.use('/admin/user', adminUser);
+app.use('/admin/car', adminCar);
+app.use('/admin/contract', adminContract);
 
 app.listen(port, () => {
     console.log('Server-running');

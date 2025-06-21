@@ -35,7 +35,7 @@ exports.payContract = async (req, res) => {
 
         const carID = contract[0].carID;
         await db.execute(
-            `UPDATE Cars SET contract_status = 'available' WHERE carID = ?`,
+            `UPDATE Cars SET car_status = 'available' WHERE carID = ?`,
             [carID]
         );
 
@@ -43,7 +43,7 @@ exports.payContract = async (req, res) => {
         res.status(200).json({ message: "Pay successfully" });
     } catch (err) {
         console.error(err);
-        res.status(500).json({ message: "Server Error" });
+        res.status(500).json({ message: "Lỗi server khi thanh toán" });
     }
 }
 

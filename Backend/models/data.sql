@@ -30,3 +30,10 @@ VALUES
 ('2025-06-10', 'bank_transfer', 1400000, 'completed', 2),
 ('2025-07-01', 'cash', 2400000, 'pending', 3);
 
+INSERT INTO Brands (brandname, country, founded_year, logo_URL)
+VALUES 
+('Honda', 'Japan', 1948, 'https://example.com/logos/honda.png'),
+('Hyundai', 'South Korea', 1967, 'https://example.com/logos/hyundai.png'),
+('Tesla', 'USA', 2003, 'https://example.com/logos/tesla.png'),
+('VinFast', 'Vietnam', 2017, 'https://example.com/logos/vinfast.png');
+
