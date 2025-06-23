@@ -18,7 +18,7 @@ const Cars = () => {
   const handleDelete = (carID) => {
     if (!window.confirm('Bạn có chắc chắn muốn xóa xe này?')) return;
 
-    fetch(`http://localhost:3000/admin/car/${carID}`, {
+    fetch(`http://localhost:3000/admin/car/delete/${carID}`, {
       method: 'DELETE',
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`
@@ -26,8 +26,9 @@ const Cars = () => {
     })
       .then(res => res.json())
       .then(data => {
-        alert(data.message);
-        setCars(cars.filter(car => car.carID !== carID));
+        if (data.message === 'Xóa thành công')
+          setCars(cars.filter(car => car.carID !== carID));
+        else alert(data.message);
       });
   };
 
@@ -40,6 +41,10 @@ const Cars = () => {
             <th>ID</th>
             <th>Tên xe</th>
             <th>Biển số</th>
+            <th>Số chỗ</th>
+            <th>Năm sản xuất</th>
+            <th>Loại nhiên liệu</th>
+            <th>Vị trí</th>
             <th>Giá</th>
             <th>Trạng thái</th>
             <th>Hành động</th>
@@ -51,6 +56,10 @@ const Cars = () => {
               <td>{car.carID}</td>
               <td>{car.carname}</td>
               <td>{car.license_plate}</td>
+              <td>{car.seats}</td>
+              <td>{car.year_manufacture}</td>
+              <td>{car.fuel_type}</td>
+              <td>{car.pickup_location}</td>
               <td>{car.price_per_date}</td>
               <td>{car.car_status}</td>
               <td>

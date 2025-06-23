@@ -101,7 +101,7 @@ const Users = () => {
       <UserDetailModal
         show={showDetail}
         handleClose={() => setShowDetail(false)}
-        userId={selectedUserId}
+        userID={selectedUserId}
       />
     </Container>
   );

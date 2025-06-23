@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { Navbar, Nav, Container, Dropdown } from 'react-bootstrap';
+import { Navbar, Nav, Container, Dropdown, Button } from 'react-bootstrap';
 import 'bootstrap-icons/font/bootstrap-icons.css';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import './Header.css';
 import LoginModal from "../Modal/LoginModal";
 import AccountModal from "../Modal/AccoutModal";
@@ -14,6 +14,9 @@ const Header = () => {
     const [showRegister, setShowRegister] = useState(false);
     const [fullname, setFullname] = useState('');
     const [loginError, setLoginError] = useState('');
+
+    const location = useLocation();
+    const user = JSON.parse(localStorage.getItem('user'));
 
     const navigate = useNavigate();
 
@@ -44,7 +47,11 @@ const Header = () => {
                     setLoginError('');
                     setFullname(data.user.fullname);
 
-                    navigate("/", { state: { reset: true } });
+                    if (data.user.admin === 1) {
+                        navigate('/admin');
+                    } else {
+                        navigate("/", { state: { reset: true } });
+                    }
 
                 } else {
                     setLoginError(data.message || 'Đăng nhập thất bại');
@@ -113,6 +120,7 @@ const Header = () => {
                         <Nav.Link onClick={handleAddCarClick} className="text-nav">ĐĂNG XE</Nav.Link>
 
                         {isLoggedIn ? (
+
                             <Dropdown align="end">
                                 <Dropdown.Toggle variant="light" className="d-flex align-items-center border-0 bg-transparent">
                                     <i className="bi bi-person-circle me-2" style={{ fontSize: '1.5rem', color: '#0d3b66' }}></i>
@@ -135,6 +143,18 @@ const Header = () => {
                                 <Nav.Link onClick={() => setShowRegister(true)} className="text-nav">Đăng ký</Nav.Link>
                             </>
                         )}
+
+                        {user?.admin === 1 && !location.pathname.startsWith('/admin') && (
+                            <Button
+                                variant="outline-primary"
+                                size="sm"
+                                className="ms-3"
+                                onClick={() => navigate('/admin')}
+                            >
+                                🔙 Quay lại quản trị
+                            </Button>
+                        )}
+
                     </Nav>
                 </Navbar.Collapse>
 

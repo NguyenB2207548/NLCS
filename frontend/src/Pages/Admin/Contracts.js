@@ -24,6 +24,7 @@ const Contracts = () => {
             <th>ID</th>
             <th>Người thuê</th>
             <th>Tên xe</th>
+            <th>Chủ xe</th>
             <th>Thời gian</th>
             <th>Tổng tiền</th>
             <th>Trạng thái</th>
@@ -35,6 +36,7 @@ const Contracts = () => {
               <td>{contract.contractID}</td>
               <td>{contract.fullname}</td>
               <td>{contract.carname}</td>
+              <td>{contract.owner}</td>
               <td>{new Date(contract.rental_start_date).toLocaleDateString()} - {new Date(contract.rental_end_date).toLocaleDateString()}</td>
               <td>{contract.total_price.toLocaleString()}</td>
               <td>{contract.contract_status}</td>
