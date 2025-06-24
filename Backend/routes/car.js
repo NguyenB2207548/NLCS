@@ -10,5 +10,6 @@ router.get('/detail/:id', carController.getDetailsCar);
 router.post('/addCar', auth, upload.single('image'), carController.addCar);
 router.delete('/:id', auth, carController.deleteCar);
 router.put('/:id', auth, carController.updateCar);
+router.get('/getStatsOfUser', auth, carController.getStatsOfUser);
 
 module.exports = router;

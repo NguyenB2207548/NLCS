@@ -199,3 +199,24 @@ exports.updateCar = async (req, res) => {
         res.status(500).json({ message: "Server Error" });
     }
 }
+
+// STATS
+exports.getStatsOfUser = async (req, res) => {
+    const id = req.user.id;
+    try {
+        const [[{ total }]] = await db.execute('SELECT COUNT(*) AS total FROM Cars WHERE userID = ?', [id]);
+        const [[{ available }]] = await db.execute(`SELECT COUNT(*) AS available FROM Cars WHERE userID = ? AND car_status = 'available'`, [id]);
+        const [[{ rented }]] = await db.execute(`SELECT COUNT(*) AS rented FROM Cars WHERE userID = ? AND car_status = 'rented'`, [id]);
+        const [maxRows] = await db.execute(`SELECT * FROM Cars WHERE userID = ? ORDER BY price_per_date DESC LIMIT 1`, [id]);
+
+        res.status(200).json({
+            total,
+            available,
+            rented,
+            maxPriceCar: maxRows[0] || null
+        });
+    } catch (err) {
+        console.error("Lỗi khi thống kê xe:", err);
+        res.status(500).json({ message: "Lỗi server" });
+    }
+};

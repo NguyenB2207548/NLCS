@@ -58,10 +58,10 @@ const PaymentModal = ({ show, handleClose, contractID, contract, onPaymentSucces
                 {/* THÔNG TIN HỢP ĐỒNG */}
                 {contract && (
                     <div className="mb-3">
-                        <p><strong>Người thuê:</strong> {contract.fullname}</p>
+                        <p><strong>Người thuê:</strong> {contract.rent_fullname}</p>
                         <p><strong>Số điện thoại:</strong> {contract.phone_number}</p>
                         <p><strong>Tên xe:</strong> {contract.carname}</p>
-                        <p><strong>Chủ xe:</strong> {contract.owner_fullname || "Chưa có"}</p>
+                        <p><strong>Chủ xe:</strong> {contract.fullname || "Chưa có"}</p>
                         <p><strong>Tổng tiền:</strong> {Number(contract.total_price).toLocaleString()} VND</p>
                     </div>
                 )}

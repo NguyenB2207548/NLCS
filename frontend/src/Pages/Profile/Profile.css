@@ -1,0 +1,15 @@
+.stat-list {
+  list-style: none;
+  padding-left: 0;
+}
+
+.stat-list li {
+  font-size: 16px;
+  margin-bottom: 6px;
+}
+
+.stat-list li strong {
+  width: 180px;
+  display: inline-block;
+  color: #0d6efd;
+}

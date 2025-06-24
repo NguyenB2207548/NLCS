@@ -78,10 +78,11 @@ exports.getContractOfUser = async (req, res) => {
     const userID = req.user.id;
 
     try {
-        const [list_rental] = await db.execute(`SELECT ct.*, c.carname, u.fullname, u.phone_number
+        const [list_rental] = await db.execute(`SELECT ct.*, c.carname, u.fullname, u.phone_number, rent.fullname AS rent_fullname
                                                 FROM Contracts ct
                                                 JOIN Cars c ON ct.carID = c.carID
                                                 JOIN Users u ON u.userID = c.userID
+                                                JOIN Users rent ON rent.userID = ct.userID
                                                 WHERE ct.userID = ?`, [userID]);
         res.status(200).json(list_rental);
     } catch (err) {
@@ -178,5 +179,39 @@ exports.softDeleteContract = async (req, res) => {
     } catch (err) {
         console.error("Lỗi khi xóa hợp đồng:", err);
         res.status(500).json({ message: 'Lỗi server.' });
+    }
+};
+
+// STATS
+exports.getStatsOfOwner = async (req, res) => {
+    try {
+        const ownerID = req.user.id; 
+
+        const [contracts] = await db.execute(
+            `SELECT contract_status FROM Contracts 
+             JOIN Cars ON Contracts.carID = cars.carID 
+             WHERE cars.userID = ?`,
+            [ownerID]
+        );
+
+        const stats = {
+            total: contracts.length,
+            pending: 0,
+            active: 0,
+            cancelled: 0,
+            completed: 0
+        };
+
+        contracts.forEach(contract => {
+            const status = contract.contract_status;
+            if (stats[status] !== undefined) {
+                stats[status]++;
+            }
+        });
+
+        return res.status(200).json(stats);
+    } catch (error) {
+        console.error("Lỗi khi thống kê hợp đồng:", error);
+        return res.status(500).json({ message: "Lỗi server" });
     }
 };

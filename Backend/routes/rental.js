@@ -11,5 +11,6 @@ router.post('/reject/:id', auth, rentalCarController.rejectContract);
 router.get('/getContractOwner', auth, rentalCarController.getContractOfOwner);
 router.delete('/deleteContract/:id', auth, rentalCarController.softDeleteContract);
 router.delete('/cancelContract/:id', auth, rentalCarController.cancelContract);
+router.get('/getStatsOfOwner', auth, rentalCarController.getStatsOfOwner);
 
 module.exports = router;
