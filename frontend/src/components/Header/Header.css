@@ -1,10 +1,10 @@
 .nav-header {
   --header-text-color: #043c78;
   color: var(--header-text-color);
-    background-color: #fff;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-    padding-top: 8px;
-    padding-bottom: 8px;
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  padding-top: 8px;
+  padding-bottom: 8px;
 }
 
 .nav-header .navbar-brand,
@@ -22,7 +22,7 @@
 }
 
 .text-nav:hover {
-    text-decoration: underline;
+  text-decoration: underline;
 }
 
 .icon-login {
@@ -31,4 +31,57 @@
   flex-direction: column;
   align-items: center;
   margin-bottom: 5px;
+}
+
+.modal {
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  /* background-color: blue; */
+}
+
+.modal-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 24px;
+}
+
+/* Tăng độ đẹp cho input */
+.form-control {
+  border-radius: 8px;
+  padding: 10px 12px;
+  border: 1px solid #ced4da;
+  font-size: 15px;
+  transition: border-color 0.2s ease;
+}
+
+.form-control:focus {
+  border-color: #4a90e2;
+  box-shadow: 0 0 0 0.15rem rgba(74, 144, 226, 0.25);
+}
+
+/* Modal đẹp hơn */
+.modal-content {
+  border-radius: 16px;
+  box-shadow: 0 5px 30px rgba(0, 0, 0, 0.15);
+  padding-top: 12px;
+}
+
+/* Nút bấm */
+button.btn-primary {
+  background-color: #1a73e8;
+  border-radius: 8px;
+  border: none;
+}
+
+button.btn-primary:hover {
+  background-color: #1669c1;
+}
+
+button.btn-secondary {
+  border-radius: 8px;
+}
+
+.alert-danger {
+  font-size: 14px;
 }

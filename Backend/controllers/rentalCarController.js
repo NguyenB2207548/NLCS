@@ -78,11 +78,12 @@ exports.getContractOfUser = async (req, res) => {
     const userID = req.user.id;
 
     try {
-        const [list_rental] = await db.execute(`SELECT ct.*, c.carname, u.fullname, u.phone_number, rent.fullname AS rent_fullname
-                                                FROM Contracts ct
+        const [list_rental] = await db.execute(`SELECT ct.*, c.carname, u.fullname, u.phone_number, rent.fullname AS rent_fullname, p.amount AS amount
+                                                FROM Contracts ct 
                                                 JOIN Cars c ON ct.carID = c.carID
                                                 JOIN Users u ON u.userID = c.userID
                                                 JOIN Users rent ON rent.userID = ct.userID
+                                                LEFT JOIN Payments p ON p.contractID = ct.contractID
                                                 WHERE ct.userID = ?`, [userID]);
         res.status(200).json(list_rental);
     } catch (err) {

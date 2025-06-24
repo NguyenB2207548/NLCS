@@ -327,63 +327,68 @@ const Profile = () => {
                         </table>
                     </div>
 
+                    {cars.length === 0 ? (
+                        <div className="text-center text-muted mt-4">
+                            Bạn chưa có xe nào. Nhấn <strong>“Thêm xe mới”</strong> để bắt đầu.
+                        </div>
+                    ) : (
+                        <Table striped bordered hover responsive className="align-middle text-center">
 
-                    <Table striped bordered hover responsive className="align-middle text-center">
-                        <thead>
-                            <tr>
-                                <th>Tên xe</th>
-                                <th>Biển số</th>
-                                <th>Số chỗ</th>
-                                <th>Vị trí</th>
-                                <th>Năm sản xuất</th>
-                                <th>Loại nhiên liệu</th>
-                                <th>Giá thuê</th>
-                                <th>Trạng thái</th>
-                                <th>Hành động</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {cars.map(car => (
-                                <tr key={car.carID}>
-                                    <td>{car.carname}</td>
-                                    <td>{car.license_plate}</td>
-                                    <td>{car.seats}</td>
-                                    <td>{car.pickup_location}</td>
-                                    <td>{car.year_manufacture}</td>
-                                    <td>{car.fuel_type}</td>
-                                    <td>{car.price_per_date.toLocaleString()}</td>
-                                    <td>
-                                        {car.car_status === 'available' ? 'Sẵn sàng' :
-                                            car.car_status === 'rented' ? 'Đang thuê' :
-                                                car.car_status}
-                                    </td>
-                                    <td>
-                                        <Button className="m-1" variant="outline-primary" size="sm" onClick={() => {
-                                            setSelectedCar(car);
-                                            setShowEditCarModal(true);
-                                        }}>Sửa</Button>
-
-                                        <Button
-                                            variant="outline-danger"
-                                            size="sm"
-                                            onClick={() => handleDelete(car.carID)}
-                                        >
-                                            Xóa
-                                        </Button>
-
-                                    </td>
+                            <thead>
+                                <tr>
+                                    <th>Tên xe</th>
+                                    <th>Biển số</th>
+                                    <th>Số chỗ</th>
+                                    <th>Vị trí</th>
+                                    <th>Năm sản xuất</th>
+                                    <th>Loại nhiên liệu</th>
+                                    <th>Giá thuê</th>
+                                    <th>Trạng thái</th>
+                                    <th>Hành động</th>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </Table>
+                            </thead>
+                            <tbody>
+                                {cars.map(car => (
+                                    <tr key={car.carID}>
+                                        <td>{car.carname}</td>
+                                        <td>{car.license_plate}</td>
+                                        <td>{car.seats}</td>
+                                        <td>{car.pickup_location}</td>
+                                        <td>{car.year_manufacture}</td>
+                                        <td>{car.fuel_type}</td>
+                                        <td>{car.price_per_date.toLocaleString()}</td>
+                                        <td>
+                                            {car.car_status === 'available' ? 'Sẵn sàng' :
+                                                car.car_status === 'rented' ? 'Đang thuê' :
+                                                    car.car_status}
+                                        </td>
+                                        <td>
+                                            <Button className="m-1" variant="outline-primary" size="sm" onClick={() => {
+                                                setSelectedCar(car);
+                                                setShowEditCarModal(true);
+                                            }}>Sửa</Button>
 
+                                            <Button
+                                                variant="outline-danger"
+                                                size="sm"
+                                                onClick={() => handleDelete(car.carID)}
+                                            >
+                                                Xóa
+                                            </Button>
+
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </Table>
+                    )}
                     <div className="text-center mt-3">
                         <Button onClick={() => navigate('/car/addCar')}>Thêm xe mới</Button>
                     </div>
 
                 </Tab>
 
-                <Tab eventKey="contracts" title="Hợp đồng thuê xe">
+                <Tab eventKey="contracts" title="Hợp đồng cho thuê xe">
                     <div className="mb-4">
                         <h5 className="fw-bold mb-3 ">Thống kê hợp đồng</h5>
                         <table className="table table-borderless table-sm w-auto">
@@ -412,71 +417,76 @@ const Profile = () => {
                         </table>
                     </div>
 
-                    <Table striped bordered hover className="mt-4">
-                        <thead>
-                            <tr>
-                                <th>Người thuê</th>
-                                <th>Liên hệ</th>
-                                <th>Tên xe</th>
-                                <th>Ngày bắt đầu</th>
-                                <th>Ngày kết thúc</th>
-                                <th>Tổng tiền</th>
-                                <th>Trạng thái</th>
-                                <th>Hành động</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {contracts.map(contract => (
-                                <tr key={contract.contractID}>
-                                    <td>{contract.fullname}</td>
-                                    <td>{contract.phone_number}</td>
-                                    <td>{contract.carname}</td>
-                                    <td>{new Date(contract.rental_start_date).toLocaleDateString()}</td>
-                                    <td>{new Date(contract.rental_end_date).toLocaleDateString()}</td>
-                                    <td>{contract.total_price.toLocaleString()}</td>
-                                    <td>{contract.contract_status}</td>
-
-                                    <td>
-                                        {contract.contract_status === 'pending' ? (
-                                            <>
-                                                <Button
-                                                    variant="success"
-                                                    size="sm"
-                                                    onClick={() => handleApprove(contract.contractID)}
-                                                >
-                                                    Duyệt
-                                                </Button>{' '}
-                                                <Button
-                                                    variant="danger"
-                                                    size="sm"
-                                                    onClick={() => handleReject(contract.contractID)}
-                                                >
-                                                    Từ chối
-                                                </Button>
-                                            </>
-                                        ) : (
-                                            <>
-                                                {contract.contract_status === 'active' && (
-                                                    // <span className="text-success">Đã duyệt</span>
-                                                    <span className="badge bg-success">Đã duyệt</span>
-                                                )}
-                                                {contract.contract_status === 'cancelled' && (
-                                                    // <span className="text-danger">Đã từ chối</span>
-                                                    <span className="badge bg-danger">Đã từ chối</span>
-                                                )}
-                                                {contract.contract_status === 'completed' && (
-                                                    // <span className="text-secondary">Đã thanh toán</span>
-                                                    <span className="badge bg-secondary">Đã thanh toán</span>
-                                                )}
-                                            </>
-                                        )}
-                                    </td>
-
+                    {contracts.length === 0 ? (
+                        <div className="text-center text-muted mt-4">
+                            Bạn chưa có hợp động cho thuê xe nào.
+                        </div>
+                    ) : (
+                        <Table striped bordered hover className="mt-4">
+                            <thead>
+                                <tr>
+                                    <th>Người thuê</th>
+                                    <th>Liên hệ</th>
+                                    <th>Tên xe</th>
+                                    <th>Ngày bắt đầu</th>
+                                    <th>Ngày kết thúc</th>
+                                    <th>Tổng tiền</th>
+                                    <th>Trạng thái</th>
+                                    <th>Hành động</th>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </Table>
+                            </thead>
+                            <tbody>
+                                {contracts.map(contract => (
+                                    <tr key={contract.contractID}>
+                                        <td>{contract.fullname}</td>
+                                        <td>{contract.phone_number}</td>
+                                        <td>{contract.carname}</td>
+                                        <td>{new Date(contract.rental_start_date).toLocaleDateString()}</td>
+                                        <td>{new Date(contract.rental_end_date).toLocaleDateString()}</td>
+                                        <td>{contract.total_price.toLocaleString()}</td>
+                                        <td>{contract.contract_status}</td>
 
+                                        <td>
+                                            {contract.contract_status === 'pending' ? (
+                                                <>
+                                                    <Button
+                                                        variant="success"
+                                                        size="sm"
+                                                        onClick={() => handleApprove(contract.contractID)}
+                                                    >
+                                                        Duyệt
+                                                    </Button>{' '}
+                                                    <Button
+                                                        variant="danger"
+                                                        size="sm"
+                                                        onClick={() => handleReject(contract.contractID)}
+                                                    >
+                                                        Từ chối
+                                                    </Button>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    {contract.contract_status === 'active' && (
+                                                        // <span className="text-success">Đã duyệt</span>
+                                                        <span className="badge bg-success">Đã duyệt</span>
+                                                    )}
+                                                    {contract.contract_status === 'cancelled' && (
+                                                        // <span className="text-danger">Đã từ chối</span>
+                                                        <span className="badge bg-danger">Đã từ chối</span>
+                                                    )}
+                                                    {contract.contract_status === 'completed' && (
+                                                        // <span className="text-secondary">Đã thanh toán</span>
+                                                        <span className="badge bg-secondary">Đã được thanh toán</span>
+                                                    )}
+                                                </>
+                                            )}
+                                        </td>
+
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </Table>
+                    )}
                 </Tab>
 
                 <Tab eventKey="revenue" title="Thống kê doanh thu">

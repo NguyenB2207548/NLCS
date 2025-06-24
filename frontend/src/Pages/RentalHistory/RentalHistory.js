@@ -1,18 +1,17 @@
 import React, { useEffect, useState } from "react";
-import { Card, Table, Spinner, Button } from "react-bootstrap";
+import { Card, Table, Button } from "react-bootstrap";
 import PaymentModal from "../../components/Modal/PaymentModal";
 
 const RentalHistory = () => {
     const [history, setHistory] = useState([]);
-    const [loading, setLoading] = useState(true);
     const [showPaymentModal, setShowPaymentModal] = useState(false);
     const [selectedContract, setSelectedContract] = useState(null);
+    const [dataLoaded, setDataLoaded] = useState(false);
 
     const fetchRentalHistory = () => {
         const token = localStorage.getItem("token");
         if (!token) return;
 
-        setLoading(true);
         fetch("http://localhost:3000/rental/getOfUser", {
             headers: {
                 Authorization: `Bearer ${token}`,
@@ -21,11 +20,11 @@ const RentalHistory = () => {
             .then((res) => res.json())
             .then((data) => {
                 setHistory(data);
-                setLoading(false);
+                setDataLoaded(true);
             })
             .catch((err) => {
                 console.error("Lỗi khi lấy lịch sử thuê:", err);
-                setLoading(false);
+                setDataLoaded(true);
             });
     };
 
@@ -45,7 +44,6 @@ const RentalHistory = () => {
             .then((res) => res.json())
             .then((data) => {
                 alert(data.message);
-                // fetchRentalHistory();
                 if (data.message === 'Xóa thành công')
                     setHistory(prev => prev.filter(item => item.contractID !== id));
             })
@@ -55,7 +53,6 @@ const RentalHistory = () => {
             });
     };
 
-    // Thanh toán
     const openPaymentModal = (contract) => {
         setSelectedContract(contract);
         setShowPaymentModal(true);
@@ -84,32 +81,36 @@ const RentalHistory = () => {
                 if (data.message === 'Hủy thành công')
                     setHistory(prev => prev.filter(item => item.contractID !== contractID));
             })
-            .catch((err) => alert("Lỗi server"));
+            .catch(() => alert("Lỗi server"));
     }
 
     return (
         <Card className="p-4 shadow-sm w-75 mx-auto mt-4">
             <h3 className="mb-4 text-center">Lịch sử thuê xe</h3>
-            {loading ? (
-                <div className="text-center">
-                    <Spinner animation="border" variant="primary" />
-                </div>
-            ) : (
-                <Table striped bordered hover>
-                    <thead>
+            <Table striped bordered hover>
+                <thead>
+                    <tr>
+                        <th>Tên xe</th>
+                        <th>Chủ xe</th>
+                        <th>Liên hệ</th>
+                        <th>Ngày bắt đầu</th>
+                        <th>Ngày kết thúc</th>
+                        <th>Tổng tiền</th>
+                        <th>Trạng thái</th>
+                        <th>Hành động</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {!dataLoaded ? (
                         <tr>
-                            <th>Tên xe</th>
-                            <th>Chủ xe</th>
-                            <th>Liên hệ</th>
-                            <th>Ngày bắt đầu</th>
-                            <th>Ngày kết thúc</th>
-                            <th>Tổng tiền</th>
-                            <th>Trạng thái</th>
-                            <th>Hành động</th>
+                            <td colSpan="8" className="text-center">Đang tải dữ liệu...</td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        {history
+                    ) : history.filter(item => item.is_deleted === 0).length === 0 ? (
+                        <tr>
+                            <td colSpan="8" className="text-center text-muted">Không có hợp đồng nào</td>
+                        </tr>
+                    ) : (
+                        history
                             .filter(item => item.is_deleted === 0)
                             .map((item) => (
                                 <tr key={item.contractID}>
@@ -123,13 +124,12 @@ const RentalHistory = () => {
                                         {item.contract_status === 'pending' && <span className="text-warning">Chờ duyệt</span>}
                                         {item.contract_status === 'active' && <span className="text-success">Đã được duyệt</span>}
                                         {item.contract_status === 'cancelled' && <span className="text-danger">Đã bị từ chối</span>}
-                                        {item.contract_status === 'completed' && <span className="text-secondary">Đã hoàn thành</span>}
+                                        {item.contract_status === 'completed' && <span className="text-secondary">Đã thanh toán</span>}
                                     </td>
                                     <td>
                                         {item.contract_status === 'pending' && (
                                             <Button variant="danger" size="sm" onClick={() => cancelContract(item.contractID)}>Hủy đơn</Button>
                                         )}
-
                                         {item.contract_status === 'active' && (
                                             <Button
                                                 variant="primary"
@@ -139,7 +139,6 @@ const RentalHistory = () => {
                                                 Thanh toán
                                             </Button>
                                         )}
-
                                         {(item.contract_status === 'completed' || item.contract_status === 'cancelled') && (
                                             <Button
                                                 variant="outline-danger"
@@ -152,10 +151,9 @@ const RentalHistory = () => {
                                     </td>
                                 </tr>
                             ))
-                        }
-                    </tbody>
-                </Table>
-            )}
+                    )}
+                </tbody>
+            </Table>
 
             <PaymentModal
                 show={showPaymentModal}

@@ -5,13 +5,19 @@ const PaymentModal = ({ show, handleClose, contractID, contract, onPaymentSucces
     const [paymentMethod, setPaymentMethod] = useState("cash");
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(false);
+    const [paymentDate, setPaymentDate] = useState('');
+    const [amount, setAmount] = useState("");
+    // const [paidAmount, setPaidAmount] = useState(0);
 
     useEffect(() => {
         if (!show) {
             setPaymentMethod("cash");
             setError(null);
             setLoading(false);
+            setAmount("");
         }
+        const today = new Date().toISOString().split('T')[0];
+        setPaymentDate(today);
     }, [show]);
 
     const handleConfirmPayment = () => {
@@ -27,6 +33,7 @@ const PaymentModal = ({ show, handleClose, contractID, contract, onPaymentSucces
             },
             body: JSON.stringify({
                 payment_method: paymentMethod,
+                amount: amount
             }),
         })
             .then((res) => res.json())
@@ -59,13 +66,14 @@ const PaymentModal = ({ show, handleClose, contractID, contract, onPaymentSucces
                 {contract && (
                     <div className="mb-3">
                         <p><strong>Người thuê:</strong> {contract.rent_fullname}</p>
-                        <p><strong>Số điện thoại:</strong> {contract.phone_number}</p>
                         <p><strong>Tên xe:</strong> {contract.carname}</p>
                         <p><strong>Chủ xe:</strong> {contract.fullname || "Chưa có"}</p>
+                        <p><strong>Liên hệ chủ xe:</strong> {contract.phone_number}</p>
                         <p><strong>Tổng tiền:</strong> {Number(contract.total_price).toLocaleString()} VND</p>
+                        <p><strong>Số tiền đã thanh toán:</strong> {Number(contract.amount ?? 0).toLocaleString()} VND</p>
+                        <p><strong>Ngày thanh toán:</strong> {paymentDate}</p>
                     </div>
                 )}
-
                 <Form>
                     <Form.Group>
                         <Form.Label>Phương thức thanh toán</Form.Label>
@@ -77,6 +85,17 @@ const PaymentModal = ({ show, handleClose, contractID, contract, onPaymentSucces
                             <option value="bank_transfer">Chuyển khoản</option>
                             <option value="momo">MoMo</option>
                         </Form.Select>
+                    </Form.Group>
+
+                    <Form.Group className="mt-3">
+                        <Form.Label>Số tiền thanh toán</Form.Label>
+                        <Form.Control
+                            type="number"
+                            placeholder="Nhập số tiền (VND)"
+                            value={amount}
+                            onChange={(e) => setAmount(e.target.value)}
+                            min={0}
+                        />
                     </Form.Group>
                 </Form>
             </Modal.Body>

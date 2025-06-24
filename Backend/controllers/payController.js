@@ -3,8 +3,8 @@ const db = require('../models/db');
 exports.payContract = async (req, res) => {
     const userID = req.user.id;
     const contractID = req.params.id;
-    const { payment_method } = req.body;
-    const payment_status = 'completed';
+    const { payment_method, amount } = req.body;
+    let payment_status = 'pending';
     try {
         const [contract] = await db.execute('SELECT * FROM Contracts WHERE contractID = ? and userID = ?', [contractID, userID]);
 
@@ -16,29 +16,37 @@ exports.payContract = async (req, res) => {
             return res.status(400).json({ message: "Contract is not confirm" });
         }
 
-        const [existing] = await db.execute(
-            'SELECT * FROM Payments WHERE contractID = ?', [contractID]);
+        const total_price = contract[0].total_price;
 
-        if (existing.length > 0) {
-            return res.status(400).json({ message: "Contract already paid" });
+        const [existing] = await db.execute('SELECT * FROM Payments WHERE contractID = ?', [contractID]);
+        if (existing.length === 0) {
+            if (amount >= total_price) {
+                payment_status = 'completed';
+            }
+            await db.execute(`INSERT INTO Payments(payment_method, total_price, payment_status, amount, contractID)
+                VALUES(?, ?, ?, ?, ?)`, [payment_method, total_price, payment_status, amount, contractID]);
+        } else {
+            const amount_total = parseFloat(amount) + parseFloat(existing[0].amount);
+            if (amount_total >= total_price) {
+                payment_status = 'completed';
+            }
+            await db.execute(`UPDATE Payments 
+                SET amount = ?, payment_status = ?, payment_date = ? 
+                WHERE contractID = ?`, [amount_total, payment_status, new Date(), contractID]);
         }
 
-        const amount = contract[0].total_price;
+        if (payment_status === 'completed') {
+            await db.execute(
+                `UPDATE Contracts SET contract_status = 'completed' WHERE contractID = ?`,
+                [contractID]
+            );
 
-        await db.execute(`INSERT INTO Payments(payment_method, total_price, payment_status, contractID)
-            VALUES(?, ?, ?, ?)`, [payment_method, amount, payment_status, contractID]);
-
-        await db.execute(
-            `UPDATE Contracts SET contract_status = 'completed' WHERE contractID = ?`,
-            [contractID]
-        );
-
-        const carID = contract[0].carID;
-        await db.execute(
-            `UPDATE Cars SET car_status = 'available' WHERE carID = ?`,
-            [carID]
-        );
-
+            const carID = contract[0].carID;
+            await db.execute(
+                `UPDATE Cars SET car_status = 'available' WHERE carID = ?`,
+                [carID]
+            );
+        }
 
         res.status(200).json({ message: "Pay successfully" });
     } catch (err) {
