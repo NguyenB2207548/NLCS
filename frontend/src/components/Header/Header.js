@@ -86,14 +86,46 @@ const Header = () => {
                 alert('Đăng ký thành công!');
                 setShowRegister(false);
                 setShowLogin(true);
-
+                return { success: true };
             } else {
-                alert(data.message || 'Đăng ký thất bại');
+                alert(data.message);
+
+                if (data.message === "Tên đăng nhập đã tồn tại") {
+                    return {
+                        success: false,
+                        errors: {
+                            username: ["Tên đăng nhập đã tồn tại"]
+                        }
+                    };
+                }
+
+                if (data.message === "Số điện thoại đã được đăng ký cho tài khoản khác") {
+                    return {
+                        success: false,
+                        errors: {
+                            phone_number: ["Số điện thoại đã được đăng ký cho tài khoản khác"]
+                        }
+                    };
+                }
+
+                return {
+                    success: false,
+                    errors: {
+                        username: ["Đã có lỗi xảy ra. Vui lòng thử lại."]
+                    }
+                };
             }
         } catch (error) {
             console.error('Lỗi đăng ký:', error);
+            return {
+                success: false,
+                errors: {
+                    username: ["Đã có lỗi kết nối. Vui lòng thử lại."]
+                }
+            };
         }
     };
+
 
     const handleAddCarClick = () => {
         const token = localStorage.getItem('token');

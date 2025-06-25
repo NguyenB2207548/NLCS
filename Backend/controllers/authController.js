@@ -59,7 +59,12 @@ exports.registerUser = async (req, res) => {
     try {
         const [existing] = await db.execute('SELECT * FROM Users WHERE username = ?', [username]);
         if (existing.length > 0) {
-            return res.status(404).json({ message: "username existing" });
+            return res.status(404).json({ message: "Tên đăng nhập đã tồn tại" });
+        }
+
+        const [phone_existing] = await db.execute('SELECT * FROM Users WHERE phone_number = ?', [phone_number]);
+        if (phone_existing.length > 0) {
+            return res.status(404).json({ message: "Số điện thoại đã được đăng ký cho tài khoản khác" });
         }
 
         const hashPassword = await bcrypt.hash(password, 10);
