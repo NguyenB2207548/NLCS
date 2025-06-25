@@ -3,6 +3,7 @@ const router = express.Router();
 const carController = require('../controllers/carController');
 const auth = require('../middleware/auth');
 const upload = require('../middleware/upload');
+const admin = require('../middleware/admin');
 
 router.get('/', carController.getCar);
 router.get('/getAllCarOfUser', auth, carController.getAllCarOfUser);
@@ -11,5 +12,6 @@ router.post('/addCar', auth, upload.single('image'), carController.addCar);
 router.delete('/:id', auth, carController.deleteCar);
 router.put('/:id', auth, carController.updateCar);
 router.get('/getStatsOfUser', auth, carController.getStatsOfUser);
+router.get('/admin/getAllCarStats', auth, admin, carController.getAllCarStats);
 
 module.exports = router;

@@ -220,3 +220,23 @@ exports.getStatsOfUser = async (req, res) => {
         res.status(500).json({ message: "Lỗi server" });
     }
 };
+
+exports.getAllCarStats = async (req, res) => {
+    try {
+        const [[{ total }]] = await db.execute('SELECT COUNT(*) AS total FROM Cars');
+        const [[{ available }]] = await db.execute(`SELECT COUNT(*) AS available FROM Cars WHERE car_status = 'available'`);
+        const [[{ rented }]] = await db.execute(`SELECT COUNT(*) AS rented FROM Cars WHERE car_status = 'rented'`);
+        const [maxRows] = await db.execute(`SELECT * FROM Cars ORDER BY price_per_date DESC LIMIT 1`);
+
+        res.status(200).json({
+            total,
+            available,
+            rented,
+            maxPriceCar: maxRows[0] || null
+        });
+    } catch (err) {
+        console.error("Lỗi khi thống kê toàn bộ xe:", err);
+        res.status(500).json({ message: "Lỗi server" });
+    }
+};
+

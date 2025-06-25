@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const rentalCarController = require('../controllers/rentalCarController');
 const auth = require('../middleware/auth');
+const admin = require('../middleware/admin');
 
 router.post('/:id', auth, rentalCarController.createRentalCar);
 router.get('/getAll', rentalCarController.getContractAll);
@@ -12,5 +13,6 @@ router.get('/getContractOwner', auth, rentalCarController.getContractOfOwner);
 router.delete('/deleteContract/:id', auth, rentalCarController.softDeleteContract);
 router.delete('/cancelContract/:id', auth, rentalCarController.cancelContract);
 router.get('/getStatsOfOwner', auth, rentalCarController.getStatsOfOwner);
+router.get('/admin/getAllContractStats', auth, admin, rentalCarController.getAllContractStats);
 
 module.exports = router;

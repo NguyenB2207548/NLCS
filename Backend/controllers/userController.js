@@ -52,3 +52,30 @@ exports.updateUser = async (req, res) => {
         res.status(500).json({ message: "Server Error" });
     }
 };
+
+exports.getUserStats = async (req, res) => {
+  try {
+    // Tổng số người dùng
+    const [[{ totalUsers }]] = await db.execute(`SELECT COUNT(*) AS totalUsers FROM Users`);
+
+    // Số người là chủ xe (có đăng ít nhất 1 xe)
+    const [[{ ownerUsers }]] = await db.execute(`
+      SELECT COUNT(DISTINCT userID) AS ownerUsers FROM Cars
+    `);
+
+    // Số người đã từng thuê xe (có ít nhất 1 hợp đồng thuê)
+    const [[{ renterUsers }]] = await db.execute(`
+      SELECT COUNT(DISTINCT userID) AS renterUsers FROM Contracts
+    `);
+
+    res.status(200).json({
+      totalUsers,
+      ownerUsers,
+      renterUsers
+    });
+  } catch (err) {
+    console.error("Lỗi thống kê người dùng:", err);
+    res.status(500).json({ message: "Lỗi server" });
+  }
+};
+

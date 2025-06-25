@@ -1,15 +1,31 @@
 import React, { useEffect, useState } from 'react';
-import { Table, Button, Container } from 'react-bootstrap';
+import { Table, Button, Container, Card, Row, Col } from 'react-bootstrap';
 import UserDetailModal from '../../components/Modal/UserDetailModal';
 
 const Users = () => {
   const [users, setUsers] = useState([]);
   const [selectedUserId, setSelectedUserId] = useState(null);
   const [showDetail, setShowDetail] = useState(false);
+  const [stats, setStats] = useState({
+    totalUsers: 0,
+    ownerUsers: 0,
+    renterUsers: 0
+  });
 
   const handleView = (id) => {
     setSelectedUserId(id);
     setShowDetail(true);
+  };
+
+  const fetchStats = () => {
+    fetch('http://localhost:3000/user/admin/getUserStats', {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`
+      }
+    })
+      .then(res => res.json())
+      .then(data => setStats(data))
+      .catch(err => console.error('Lỗi khi lấy thống kê người dùng:', err));
   };
 
   useEffect(() => {
@@ -21,6 +37,8 @@ const Users = () => {
       .then(res => res.json())
       .then(data => setUsers(data))
       .catch(err => console.error(err));
+
+    fetchStats();
   }, []);
 
   const handleToggleStatus = (id) => {
@@ -50,10 +68,39 @@ const Users = () => {
       });
   };
 
-
   return (
     <Container className="mt-4">
-      <h3 className="mb-3">Quản lý người dùng</h3>
+      <h3 className="mb-4">Quản lý người dùng</h3>
+
+      {/* THỐNG KÊ */}
+      <Row className="mb-4">
+        <Col md={4}>
+          <Card className="text-center shadow-sm">
+            <Card.Body>
+              <h6 className="text-muted">Tổng người dùng</h6>
+              <h4 className="text-primary">{stats.totalUsers}</h4>
+            </Card.Body>
+          </Card>
+        </Col>
+        <Col md={4}>
+          <Card className="text-center shadow-sm">
+            <Card.Body>
+              <h6 className="text-muted">Số người có xe cho thuê</h6>
+              <h4 className="text-success">{stats.ownerUsers}</h4>
+            </Card.Body>
+          </Card>
+        </Col>
+        <Col md={4}>
+          <Card className="text-center shadow-sm">
+            <Card.Body>
+              <h6 className="text-muted">Số người đã thuê xe</h6>
+              <h4 className="text-warning">{stats.renterUsers}</h4>
+            </Card.Body>
+          </Card>
+        </Col>
+      </Row>
+
+      {/* BẢNG NGƯỜI DÙNG */}
       <Table striped bordered hover>
         <thead>
           <tr>
@@ -79,7 +126,6 @@ const Users = () => {
                 <Button variant="info" size="sm" className="me-1" onClick={() => handleView(user.userID)}>
                   Xem
                 </Button>
-
                 <Button
                   variant={user.is_active ? "warning" : "success"}
                   size="sm"
@@ -88,15 +134,11 @@ const Users = () => {
                 >
                   {user.is_active ? "Vô hiệu hóa" : "Kích hoạt"}
                 </Button>
-
               </td>
-
             </tr>
           ))}
         </tbody>
-
       </Table>
-
 
       <UserDetailModal
         show={showDetail}

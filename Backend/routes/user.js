@@ -7,5 +7,6 @@ const admin = require('../middleware/admin');
 router.get('/', userController.getAllUser);
 router.get('/:id', auth, userController.getUser)
 router.put('/update', auth, userController.updateUser);
+router.get('/admin/getUserStats', auth, admin, userController.getUserStats);
 
 module.exports = router;

@@ -15,13 +15,11 @@ exports.createRentalCar = async (req, res) => {
     }
 
     try {
-        // 1. Kiểm tra xe có tồn tại không
         const [cars] = await db.execute('SELECT * FROM Cars WHERE carID = ?', [carID]);
         if (cars.length === 0) {
             return res.status(404).json({ message: "Không tìm thấy xe" });
         }
 
-        // 2. Kiểm tra xem xe đã được đặt trong thời gian này chưa
         const [overlapContracts] = await db.execute(`
             SELECT * FROM Contracts
             WHERE carID = ?
@@ -33,7 +31,6 @@ exports.createRentalCar = async (req, res) => {
             return res.status(400).json({ message: "Xe đã được đặt trong khoảng thời gian này" });
         }
 
-        // 3. Tính tổng tiền và tạo hợp đồng
         const pricePerDay = cars[0].price_per_date;
         const totalPrice = rentalDays * pricePerDay;
 
@@ -163,7 +160,8 @@ exports.getContractOfOwner = async (req, res) => {
                                         FROM Contracts ct
                                         JOIN Cars c ON ct.carID = c.carID
                                         JOIN Users u ON ct.userID = u.userID
-                                        WHERE c.userID = ?`, [ownerID]);
+                                        WHERE c.userID = ?
+                                        ORDER BY ct.rental_start_date DESC`, [ownerID]);
         res.status(200).json(contracts);
     } catch (err) {
         console.error(err);
@@ -194,6 +192,34 @@ exports.getStatsOfOwner = async (req, res) => {
              WHERE cars.userID = ?`,
             [ownerID]
         );
+
+        const stats = {
+            total: contracts.length,
+            pending: 0,
+            active: 0,
+            cancelled: 0,
+            completed: 0
+        };
+
+        contracts.forEach(contract => {
+            const status = contract.contract_status;
+            if (stats[status] !== undefined) {
+                stats[status]++;
+            }
+        });
+
+        return res.status(200).json(stats);
+    } catch (error) {
+        console.error("Lỗi khi thống kê hợp đồng:", error);
+        return res.status(500).json({ message: "Lỗi server" });
+    }
+};
+
+exports.getAllContractStats = async (req, res) => {
+    try {
+        const [contracts] = await db.execute(`
+            SELECT contract_status FROM Contracts
+        `);
 
         const stats = {
             total: contracts.length,
