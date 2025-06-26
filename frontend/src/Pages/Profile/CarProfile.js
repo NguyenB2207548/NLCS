@@ -162,7 +162,7 @@ const CarProfile = () => {
                                 <td>
                                     {car.car_status === 'available' ? 'Sẵn sàng' :
                                         car.car_status === 'rented' ? 'Đang thuê' :
-                                            car.car_status}
+                                            'Đang bảo trì'}
                                 </td>
                                 <td>
                                     <Button

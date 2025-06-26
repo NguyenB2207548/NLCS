@@ -119,6 +119,7 @@ const Cars = () => {
               <td>
                 {car.car_status === 'available' && <Badge bg="success">Sẵn sàng</Badge>}
                 {car.car_status === 'rented' && <Badge bg="warning" text="dark">Đang thuê</Badge>}
+                {car.car_status === 'maintenance' && <Badge bg="secondary">Đang bảo trì</Badge>}
               </td>
               <td>
                 <Button variant="danger" size="sm" onClick={() => handleDelete(car.carID)}>Xóa</Button>

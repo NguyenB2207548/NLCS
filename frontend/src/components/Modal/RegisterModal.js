@@ -56,13 +56,13 @@ const RegisterModal = ({ show, handleClose, handleRegister }) => {
       const phoneNumberErrors = [];
 
       if (!/^\d+$/.test(value)) {
-        phoneNumberErrors.push("• Chỉ được chứa chữ số.");
+        phoneNumberErrors.push("Chỉ được chứa chữ số.");
       }
       if (/\s/.test(value)) {
-        phoneNumberErrors.push("• Không được chứa khoảng trắng.");
+        phoneNumberErrors.push("Không được chứa khoảng trắng.");
       }
       if (value.length < 10 || value.length > 11) {
-        phoneNumberErrors.push("• Phải có độ dài từ 10 đến 11 chữ số.");
+        phoneNumberErrors.push("Phải có độ dài từ 10 đến 11 chữ số.");
       }
 
       if (phoneNumberErrors.length > 0) {
@@ -105,6 +105,7 @@ const RegisterModal = ({ show, handleClose, handleRegister }) => {
     setErrors(newErrors);
   };
 
+  // SUMIT
   const onSubmit = async (e) => {
     e.preventDefault();
 
@@ -114,16 +115,16 @@ const RegisterModal = ({ show, handleClose, handleRegister }) => {
     const usernameErrors = [];
 
     if (!formData.username) {
-      usernameErrors.push("• Không được để trống.");
+      usernameErrors.push("Không được để trống.");
     } else {
       if (formData.username.length < 6) {
-        usernameErrors.push("• Tên đăng nhập phải từ 6 ký tự trở lên.");
+        usernameErrors.push("Tên đăng nhập phải từ 6 ký tự trở lên.");
       }
       if (/\s/.test(formData.username)) {
-        usernameErrors.push("• Không được chứa khoảng trắng.");
+        usernameErrors.push("Không được chứa khoảng trắng.");
       }
       if (!/^[a-zA-Z0-9]+$/.test(formData.username)) {
-        usernameErrors.push("• Chỉ được chứa chữ cái và số, không chứa ký tự đặc biệt.");
+        usernameErrors.push("Chỉ được chứa chữ cái và số, không chứa ký tự đặc biệt.");
       }
     }
 
@@ -135,7 +136,7 @@ const RegisterModal = ({ show, handleClose, handleRegister }) => {
     const password = formData.password;
 
     if (!password) {
-      passwordErrors.push("• Mật khẩu không được để trống.");
+      passwordErrors.push("Mật khẩu không được để trống.");
     } else {
       if (password.length < 8 || password.length > 24) {
         passwordErrors.push("Mật khẩu phải từ 8 đến 24 ký tự.");

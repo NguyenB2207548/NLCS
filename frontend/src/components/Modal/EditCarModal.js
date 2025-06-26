@@ -90,7 +90,7 @@ const EditCarModal = ({ show, handleClose, carData, onSave }) => {
                         <Form.Label>Trạng thái</Form.Label>
                         <Form.Select name="car_status" value={form.car_status || ''} onChange={handleChange}>
                             <option value="available">Sẵn sàng</option>
-                            <option value="rented">Đang thuê</option>
+                            <option value="maintenance">Bảo trì</option>
                         </Form.Select>
                     </Form.Group>
                     <Form.Group className="mb-2">
