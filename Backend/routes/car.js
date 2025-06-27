@@ -8,7 +8,10 @@ const admin = require('../middleware/admin');
 router.get('/', carController.getCar);
 router.get('/getAllCarOfUser', auth, carController.getAllCarOfUser);
 router.get('/detail/:id', carController.getDetailsCar);
-router.post('/addCar', auth, upload.single('image'), carController.addCar);
+router.post('/addCar', auth, upload.fields([
+    { name: 'main_image', maxCount: 1 },
+    { name: 'sub_images', maxCount: 10 }
+]), carController.addCar);
 router.delete('/:id', auth, carController.deleteCar);
 router.put('/:id', auth, carController.updateCar);
 router.get('/getStatsOfUser', auth, carController.getStatsOfUser);

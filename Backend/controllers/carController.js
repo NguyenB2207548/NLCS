@@ -60,8 +60,9 @@ exports.getCar = async (req, res) => {
 // READ DETAIL
 exports.getDetailsCar = async (req, res) => {
     const carID = req.params.id;
+
     try {
-        const [rows] = await db.execute(`
+        const [carRows] = await db.execute(`
             SELECT C.*, B.brandname, U.fullname AS ownerName, U.phone_number
             FROM Cars C
             JOIN Brands B ON C.brandID = B.brandID
@@ -69,17 +70,25 @@ exports.getDetailsCar = async (req, res) => {
             WHERE C.carID = ?`,
             [carID]);
 
-        if (rows.length === 0) {
-            return res.status(404).json({ message: 'not found' });
+        if (carRows.length === 0) {
+            return res.status(404).json({ message: 'Xe không tồn tại' });
         }
 
-        res.json(rows[0]);
-    }
-    catch (err) {
+        const car = carRows[0];
+
+        const [imageRows] = await db.execute(`
+            SELECT imgURL FROM Car_images WHERE carID = ?`,
+            [carID]);
+
+        car.images = imageRows;
+
+        res.json(car);
+    } catch (err) {
         console.error('Error: ', err);
-        res.status(500).json({ error: 'Server Error' });
+        res.status(500).json({ error: 'Lỗi server' });
     }
 };
+
 
 // READ ALL CARS OF USER
 exports.getAllCarOfUser = async (req, res) => {
@@ -117,28 +126,56 @@ exports.addCar = async (req, res) => {
 
     const userID = req.user.id;
 
-    const img_URL = req.file ? req.file.filename : null;
+    const mainImage = req.files?.main_image?.[0];
+    const subImages = req.files?.sub_images || [];
 
-    if (!img_URL) {
-        return res.status(400).json({ message: 'Ảnh xe là bắt buộc' });
+    if (!mainImage) {
+        return res.status(400).json({ message: 'Ảnh chính là bắt buộc' });
     }
 
+    const conn = await db.getConnection(); 
+
     try {
-        await db.query(
-            'INSERT INTO Cars(carname, license_plate, year_manufacture, seats, fuel_type, pickup_location, price_per_date, userID, brandID, img_URL) VALUES(?,?,?,?,?,?,?,?,?,?)',
-            [carname, license_plate, year_manufacture, seats, fuel_type, pickup_location, price_per_date, userID, brandID, img_URL]
+        await conn.beginTransaction();
+
+        const [result] = await conn.query(
+            `INSERT INTO Cars (
+                carname, license_plate, year_manufacture, seats,
+                fuel_type, pickup_location, price_per_date,
+                userID, brandID, img_URL
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            [
+                carname, license_plate, year_manufacture, seats,
+                fuel_type, pickup_location, price_per_date,
+                userID, brandID, mainImage.filename
+            ]
         );
 
-        res.status(200).json({ message: 'Thêm xe mới thàng công' });
+        const carID = result.insertId;
+
+        const insertImagePromises = subImages.map(img =>
+            conn.query(
+                'INSERT INTO Car_images (carID, imgURL) VALUES (?, ?)',
+                [carID, img.filename]
+            )
+        );
+        await Promise.all(insertImagePromises);
+
+        await conn.commit();
+
+        res.status(200).json({ message: 'Thêm xe mới thành công', carID });
     } catch (err) {
+        await conn.rollback();
         console.error(err);
         if (err.code === 'ER_DUP_ENTRY') {
             return res.status(409).json({ message: 'Biển số xe đã tồn tại' });
         }
-
-        res.status(500).json({ message: 'Server Error' });
+        res.status(500).json({ message: 'Lỗi server khi thêm xe' });
+    } finally {
+        conn.release();
     }
 };
+
 
 // DELETE
 exports.deleteCar = async (req, res) => {

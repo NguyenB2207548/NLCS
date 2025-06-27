@@ -62,6 +62,14 @@ create table Payments (
     foreign key (contractID) references Contracts (contractID)
 );
 
+create table Car_images (
+	imgID int auto_increment,
+    carID int,
+    imgURL varchar(255),
+    primary key (imgID),
+    foreign key (carID) references Cars(carID) ON DELETE CASCADE
+);
+
 ALTER TABLE Users ADD COLUMN admin BOOLEAN DEFAULT FALSE;
 alter table Cars add column img_URL varchar(255);
 

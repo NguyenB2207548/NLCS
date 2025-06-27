@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { Container, Row, Col, Button } from 'react-bootstrap';
 import { FaPhoneAlt } from 'react-icons/fa';
 import './CarDetail.css';
+
 const CarDetail = () => {
   const { id } = useParams();
   const [car, setCar] = useState(null);
@@ -20,17 +21,32 @@ const CarDetail = () => {
     <Container className="py-5 border">
       <h2 className="fw-bold mb-3">{car.carname}</h2>
       <div className="mb-3">
-        <span className="badge bg-light text-dark">{'Giao xe tận nơi'}</span>
+        <span className="badge bg-light text-dark">Giao xe tận nơi</span>
       </div>
 
       <Row>
         <Col md={7}>
+          {/* Ảnh chính */}
           <img
             src={`http://localhost:3000/uploads/${car.img_URL}`}
             alt={car.carname}
-            className="rounded w-100"
-            style={{ maxHeight: '600px', objectFit: 'cover' }}
+            className="rounded w-100 mb-3"
+            style={{ maxHeight: '500px', objectFit: 'cover' }}
           />
+
+          {/* Ảnh phụ */}
+          <Row>
+            {car.images && car.images.length > 0 && car.images.map((img, index) => (
+              <Col xs={6} md={4} key={index} className="mb-3">
+                <img
+                  src={`http://localhost:3000/uploads/${img.imgURL}`}
+                  alt={`Ảnh phụ ${index + 1}`}
+                  className="w-100 rounded"
+                  style={{ height: '150px', objectFit: 'cover' }}
+                />
+              </Col>
+            ))}
+          </Row>
         </Col>
 
         <Col md={5}>
@@ -69,7 +85,6 @@ const CarDetail = () => {
               <FaPhoneAlt className="me-2 icon-phone" />
               <strong className="phone-number">{car.phone_number}</strong>
             </div>
-
           </div>
         </Col>
       </Row>
