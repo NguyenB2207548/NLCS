@@ -133,7 +133,7 @@ exports.addCar = async (req, res) => {
         return res.status(400).json({ message: 'Ảnh chính là bắt buộc' });
     }
 
-    const conn = await db.getConnection(); 
+    const conn = await db.getConnection();
 
     try {
         await conn.beginTransaction();
@@ -276,4 +276,26 @@ exports.getAllCarStats = async (req, res) => {
         res.status(500).json({ message: "Lỗi server" });
     }
 };
+
+exports.getSimilarCars = async (req, res) => {
+    const carID = req.params.id;
+
+    try {
+        const [current] = await db.execute(`SELECT pickup_location, seats FROM Cars WHERE carID = ?`, [carID]);
+        const { pickup_location, seats } = current[0];
+
+        const [similarCars] = await db.execute(`SELECT * FROM Cars 
+                                                WHERE carID != ? AND (pickup_location = ? OR seats = ?)
+                                                ORDER BY
+                                                    (pickup_location = ? AND seats = ?) DESC,
+                                                    (pickup_location = ?) DESC,
+                                                    (seats = ?) DESC
+                                                LIMIT 4`,
+            [carID, pickup_location, seats, pickup_location, seats, pickup_location, seats]);
+        res.status(200).json(similarCars);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "Lỗi server" });
+    }
+}
 

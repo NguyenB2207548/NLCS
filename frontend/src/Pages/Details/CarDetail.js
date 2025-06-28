@@ -1,18 +1,27 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Container, Row, Col, Button } from 'react-bootstrap';
 import { FaPhoneAlt } from 'react-icons/fa';
 import './CarDetail.css';
+import RentalModal from '../../components/Modal/RentalModal';
 
 const CarDetail = () => {
   const { id } = useParams();
   const [car, setCar] = useState(null);
+  const [suggestions, setSuggestions] = useState([]);
+  const [showRentalModal, setShowRentalModal] = useState(false);
+  const suggestionsRef = useRef();
 
   useEffect(() => {
     fetch(`http://localhost:3000/car/detail/${id}`)
       .then((res) => res.json())
       .then((data) => setCar(data))
       .catch((err) => console.error('Fetch car error:', err));
+
+    fetch(`http://localhost:3000/car/similarCars/${id}`)
+      .then((res) => res.json())
+      .then((data) => setSuggestions(data))
+      .catch((err) => console.error('Fetch similar cars error:', err));
   }, [id]);
 
   if (!car) return <p>Đang tải...</p>;
@@ -71,11 +80,9 @@ const CarDetail = () => {
               <Col xs={6}>{car.price_per_date.toLocaleString()}đ/ngày</Col>
             </Row>
 
-            <Link to={`/rental/${car.carID}`}>
-              <Button className="w-100 mt-4 mb-3 button-datxe">
-                Đặt xe ngay
-              </Button>
-            </Link>
+            <Button className="w-100 mt-4 mb-3 button-datxe" onClick={() => setShowRentalModal(true)}>
+              Đặt xe ngay
+            </Button>
 
             <div>
               <p className="text-center text-contract">Liên hệ càng sớm càng tốt</p>
@@ -88,6 +95,47 @@ const CarDetail = () => {
           </div>
         </Col>
       </Row>
+
+      <div ref={suggestionsRef}>
+        {suggestions.length > 0 && (
+          <>
+            <h4 className="mt-5 fw-bold">Gợi ý xe tương tự</h4>
+            <Row className="mt-3">
+              {suggestions.map((item) => (
+                <Col md={3} sm={6} key={item.carID} className="mb-4">
+                  <Link to={`/car/detail/${item.carID}`} className="text-decoration-none text-dark">
+                    <div className="border rounded shadow-sm h-100">
+                      <img
+                        src={`http://localhost:3000/uploads/${item.img_URL}`}
+                        alt={item.carname}
+                        className="w-100 rounded-top"
+                        style={{ height: '160px', objectFit: 'cover' }}
+                      />
+                      <div className="p-2">
+                        <h6 className="fw-bold mb-1">{item.carname}</h6>
+                        <p className="mb-0 text-muted">{item.price_per_date.toLocaleString()}đ/ngày</p>
+                        <p className="mb-0 text-muted">{item.pickup_location}</p>
+                        <p className="mb-0 text-muted">{item.seats} chỗ</p>
+                      </div>
+                    </div>
+                  </Link>
+                </Col>
+              ))}
+            </Row>
+          </>
+        )}
+      </div>
+
+      <RentalModal
+        show={showRentalModal}
+        handleClose={() => setShowRentalModal(false)}
+        carInfo={car}
+        suggestionsRef={suggestionsRef} 
+        onSuccess={() => {
+          setShowRentalModal(false);
+        }}
+      />
+
     </Container>
   );
 };
