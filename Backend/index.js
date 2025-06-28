@@ -12,7 +12,8 @@ const brandRouter = require('./routes/brand');
 const adminUser = require('./routes/admin/adminUser');
 const adminCar = require('./routes/admin/adminCar');
 const adminContract = require('./routes/admin/adminContract');
-const statsRouter = require('./routes/stats')
+const statsRouter = require('./routes/stats');
+const notificationRouter = require('./routes/notification');
 
 app.use(express.json());
 app.use(cors());
@@ -31,6 +32,7 @@ app.use('/stats', statsRouter);
 app.use('/admin/user', adminUser);
 app.use('/admin/car', adminCar);
 app.use('/admin/contract', adminContract);
+app.use('/notification', notificationRouter);
 
 app.listen(port, () => {
     console.log('Server-running');

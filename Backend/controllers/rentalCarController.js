@@ -95,31 +95,69 @@ exports.confirmContract = async (req, res) => {
     const contract_status = 'active';
     const car_status = 'rented';
 
+    const conn = await db.getConnection();
+
     try {
-        const [contracts] = await db.execute(`SELECT ct.*
-                                        FROM Contracts ct
-                                        JOIN Cars c ON ct.carID = c.carID
-                                        WHERE c.userID = ? AND ct.contractID = ?`, [userID, contractID]);
+        await conn.beginTransaction();
+
+        const [contracts] = await conn.execute(`
+            SELECT ct.*, c.userID AS ownerID, c.carname
+            FROM Contracts ct
+            JOIN Cars c ON ct.carID = c.carID
+            WHERE ct.contractID = ? AND c.userID = ?
+        `, [contractID, userID]);
+
         if (contracts.length === 0) {
-            return res.status(400).json({ message: "Not found Contract or no owner" });
+            await conn.rollback();
+            return res.status(404).json({ message: "Không tìm thấy hợp đồng hoặc bạn không phải chủ xe" });
         }
 
-        const carID = contracts[0].carID;
+        const contract = contracts[0];
+        if (contract.contract_status === 'active') {
+            await conn.rollback();
+            return res.status(400).json({ message: "Hợp đồng đã được duyệt trước đó" });
+        }
 
-        await db.execute('UPDATE Contracts SET contract_status = ? WHERE contractID = ?', [contract_status, contractID]);
+        const carID = contract.carID;
+        const renterID = contract.userID;
 
-        await db.execute(
+        await conn.execute(
+            'UPDATE Contracts SET contract_status = ? WHERE contractID = ?',
+            [contract_status, contractID]
+        );
+
+        await conn.execute(
             'UPDATE Cars SET car_status = ? WHERE carID = ?',
             [car_status, carID]
         );
 
-        res.status(200).json({ message: "Xác nhận thành công" });
+        function formatDate(date) {
+            const d = new Date(date);
+            const day = String(d.getDate()).padStart(2, '0');
+            const month = String(d.getMonth() + 1).padStart(2, '0'); 
+            const year = d.getFullYear();
+            return `${day}/${month}/${year}`;
+        }
+
+        const message = `Hợp đồng thuê xe "${contract.carname}" (từ ${formatDate(contract.rental_start_date)} đến ${formatDate(contract.rental_end_date)}) đã được chủ xe duyệt.`;
+
+        await conn.execute(
+            'INSERT INTO Notifications (userID, message) VALUES (?, ?)',
+            [renterID, message]
+        );
+
+        await conn.commit();
+        res.status(200).json({ message: "Duyệt hợp đồng thành công" });
 
     } catch (err) {
-        console.error(err);
-        res.status(500).json({ message: "Server Error" });
+        console.error("Lỗi khi duyệt hợp đồng:", err);
+        await conn.rollback();
+        res.status(500).json({ message: "Lỗi server khi duyệt hợp đồng" });
+    } finally {
+        conn.release();
     }
-}
+};
+
 
 exports.rejectContract = async (req, res) => {
     const userID = req.user.id;
@@ -184,7 +222,7 @@ exports.softDeleteContract = async (req, res) => {
 // STATS
 exports.getStatsOfOwner = async (req, res) => {
     try {
-        const ownerID = req.user.id; 
+        const ownerID = req.user.id;
 
         const [contracts] = await db.execute(
             `SELECT contract_status FROM Contracts 

@@ -70,6 +70,15 @@ create table Car_images (
     foreign key (carID) references Cars(carID) ON DELETE CASCADE
 );
 
+CREATE TABLE Notifications (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    userID INT NOT NULL,
+    message TEXT,
+    is_read BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (userID) REFERENCES Users(userID) ON DELETE CASCADE
+);
+
 ALTER TABLE Users ADD COLUMN admin BOOLEAN DEFAULT FALSE;
 alter table Cars add column img_URL varchar(255);
 
