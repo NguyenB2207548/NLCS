@@ -13,7 +13,9 @@ import AdminPage from './Pages/Admin/AdminPage';
 import Users from './Pages/Admin/Users';
 import Cars from './Pages/Admin/Cars';
 import Contracts from './Pages/Admin/Contracts';
-import Dashboard from './Pages/Admin/Dashboard'
+import Dashboard from './Pages/Admin/Dashboard';
+import PaymentSuccess from './Pages/Payment/PaymentSuccess';
+import PaymentCancel from './Pages/Payment/PaymentCancel';
 
 function App() {
   return (
@@ -38,6 +40,9 @@ function App() {
             <Route path="cars" element={<Cars />} />
             <Route path="contracts" element={<Contracts />} />
           </Route>
+
+          <Route path="/payment-success" element={<PaymentSuccess />} />
+          <Route path="/payment-cancel" element={<PaymentCancel />} />
 
         </Routes>
       </main>

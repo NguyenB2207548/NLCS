@@ -20,39 +20,71 @@ const PaymentModal = ({ show, handleClose, contractID, contract, onPaymentSucces
         setPaymentDate(today);
     }, [show]);
 
-    const handleConfirmPayment = () => {
+    const handleConfirmPayment = async () => {
         const token = localStorage.getItem("token");
         if (!token) return;
 
         setLoading(true);
-        fetch(`http://localhost:3000/pay/${contractID}`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify({
-                payment_method: paymentMethod,
-                amount: amount
-            }),
-        })
-            .then((res) => res.json())
-            .then((data) => {
-                if (data.message === "Pay successfully") {
-                    onPaymentSuccess();
-                    handleClose();
+        setError(null);
+
+        // STRIPE
+        if (paymentMethod === 'stripe') {
+            
+            try {
+                const res = await fetch('http://localhost:3000/pay/stripe/create-checkout-session', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ contractID: contractID })
+                });
+               
+                const data = await res.json();
+
+                if (res.ok && data.url) {
+                    window.location.href = data.url;
                 } else {
-                    setError(data.message || "Thanh toán thất bại");
+                    setError(data.message || "Lỗi khi tạo phiên thanh toán");
                 }
-            })
-            .catch((err) => {
-                console.error("Lỗi thanh toán:", err);
-                setError("Lỗi kết nối đến server");
-            })
-            .finally(() => {
-                setLoading(false);
+            } catch (err) {
+                console.error("Stripe payment error:", err);
+                setError("Lỗi kết nối tới Stripe");
+            } finally {
+                setLoading(false); 
+            }
+            return;
+        }
+
+        try {
+            const res = await fetch(`http://localhost:3000/pay/${contractID}`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify({
+                    payment_method: paymentMethod,
+                    amount: amount
+                }),
             });
+
+            const data = await res.json();
+
+            if (res.ok && data.message === "Pay successfully") {
+                onPaymentSuccess();
+                handleClose();
+            } else {
+                setError(data.message || "Thanh toán thất bại");
+            }
+        } catch (err) {
+            console.error("Lỗi thanh toán:", err);
+            setError("Lỗi kết nối đến server");
+        } finally {
+            setLoading(false);
+        }
     };
+
 
     return (
         <Modal show={show} onHide={handleClose}>
@@ -82,8 +114,7 @@ const PaymentModal = ({ show, handleClose, contractID, contract, onPaymentSucces
                             onChange={(e) => setPaymentMethod(e.target.value)}
                         >
                             <option value="cash">Tiền mặt</option>
-                            <option value="bank_transfer">Chuyển khoản</option>
-                            <option value="momo">MoMo</option>
+                            <option value="stripe">Thanh toán online (Stripe)</option>
                         </Form.Select>
                     </Form.Group>
 
