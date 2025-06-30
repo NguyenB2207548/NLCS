@@ -6,6 +6,8 @@ const RentalModal = ({ show, handleClose, carInfo, onSuccess, suggestionsRef }) 
   const [rental_start_date, setStartDate] = useState('');
   const [rental_end_date, setEndDate] = useState('');
   const [renterName, setRenterName] = useState('');
+  const [bookedRanges, setBookedRanges] = useState([]);
+
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -19,6 +21,17 @@ const RentalModal = ({ show, handleClose, carInfo, onSuccess, suggestionsRef }) 
     }
   }, []);
 
+  useEffect(() => {
+    if (carInfo?.carID) {
+      fetch(`http://localhost:3000/car/rentedPeriods/${carInfo.carID}`)
+        .then(res => res.json())
+        .then(data => {
+          setBookedRanges(data || []);
+        })
+        .catch(err => console.error("Lỗi khi lấy danh sách thời gian thuê:", err));
+    }
+  }, [carInfo?.carID]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const token = localStorage.getItem('token');
@@ -31,7 +44,10 @@ const RentalModal = ({ show, handleClose, carInfo, onSuccess, suggestionsRef }) 
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`
         },
-        body: JSON.stringify({ rental_start_date, rental_end_date })
+        body: JSON.stringify({
+          rental_start_date,
+          rental_end_date,
+        })
       });
 
       const result = await res.json();
@@ -40,7 +56,7 @@ const RentalModal = ({ show, handleClose, carInfo, onSuccess, suggestionsRef }) 
         handleClose();
         onSuccess?.();
       } else {
-        if (result.message === 'Xe đã được đặt trong khoảng thời gian này') {
+        if (result.message === 'Xe đang được thuê trong khoảng thời gian này' || result.message === 'Xe đang bảo trì, không thể thuê vào lúc này') {
           alert(result.message);
           handleClose();
 
@@ -55,8 +71,16 @@ const RentalModal = ({ show, handleClose, carInfo, onSuccess, suggestionsRef }) 
     }
   };
 
+  useEffect(() => {
+    if (show) {
+      setStartDate('');
+      setEndDate('');
+    }
+  }, [show]);
+
+
   return (
-    <Modal show={show} onHide={handleClose} centered>
+    <Modal show={show} onHide={handleClose} centered size='xl'>
       <Modal.Header closeButton>
         <Modal.Title>Thuê xe: {carInfo?.carname}</Modal.Title>
       </Modal.Header>
@@ -68,8 +92,25 @@ const RentalModal = ({ show, handleClose, carInfo, onSuccess, suggestionsRef }) 
               <Form.Control value={renterName} disabled />
             </Col>
             <Col>
-              <Form.Label>Biển số</Form.Label>
-              <Form.Control value={carInfo?.license_plate} disabled />
+              <Form.Label>Chủ xe</Form.Label>
+              <Form.Control value={carInfo?.ownerName || "Không có thông tin"} disabled />
+            </Col>
+          </Row>
+
+          <Row className="mb-3">
+            <Col>
+              <Form.Label>Nơi nhận xe</Form.Label>
+              <Form.Control
+                value={carInfo?.pickup_location || "Không có thông tin"}
+                disabled
+              />
+            </Col>
+            <Col>
+              <Form.Label>Giá thuê (VNĐ/ngày)</Form.Label>
+              <Form.Control
+                value={carInfo?.price_per_date?.toLocaleString('vi-VN') + ' ₫' || '---'}
+                disabled
+              />
             </Col>
           </Row>
 
@@ -81,6 +122,28 @@ const RentalModal = ({ show, handleClose, carInfo, onSuccess, suggestionsRef }) 
             <Col>
               <Form.Label>Ngày kết thúc thuê</Form.Label>
               <Form.Control type="date" value={rental_end_date} onChange={(e) => setEndDate(e.target.value)} required />
+            </Col>
+          </Row>
+
+          <Row className="mb-2">
+            <Col>
+              <Form.Label className="text-danger">📅 Lịch thuê xe:</Form.Label>
+              <ul className="mb-2" style={{ paddingLeft: '1.2rem' }}>
+                {carInfo?.car_status === 'maintenance' ? (
+                  <div className="text-warning">🛠️ Xe đang bảo trì, tạm thời không khả dụng</div>
+                ) : bookedRanges.length === 0 ? (
+                  <div className="text-success">✅ Xe đang sẵn sàng cho thuê</div>
+                ) : (
+                  bookedRanges.map((range, idx) => (
+                    <li key={idx}>
+                      {new Date(range.rental_start_date).toLocaleDateString('vi-VN')} -{' '}
+                      {new Date(range.rental_end_date).toLocaleDateString('vi-VN')}
+                    </li>
+                  ))
+                )}
+              </ul>
+
+
             </Col>
           </Row>
 

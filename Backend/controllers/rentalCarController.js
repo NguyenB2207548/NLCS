@@ -20,15 +20,19 @@ exports.createRentalCar = async (req, res) => {
             return res.status(404).json({ message: "Không tìm thấy xe" });
         }
 
+        if (cars[0].car_status === 'maintenance') {
+            return res.status(400).json({ message: "Xe đang bảo trì, không thể thuê vào lúc này" });
+        }
+
         const [overlapContracts] = await db.execute(`
             SELECT * FROM Contracts
             WHERE carID = ?
-              AND contract_status IN ('pending', 'active')
+              AND contract_status IN ('active')
               AND NOT (rental_end_date < ? OR rental_start_date > ?)
         `, [carID, rental_start_date, rental_end_date]);
 
         if (overlapContracts.length > 0) {
-            return res.status(400).json({ message: "Xe đã được đặt trong khoảng thời gian này" });
+            return res.status(400).json({ message: "Xe đang được thuê trong khoảng thời gian này" });
         }
 
         const pricePerDay = cars[0].price_per_date;
@@ -75,13 +79,15 @@ exports.getContractOfUser = async (req, res) => {
     const userID = req.user.id;
 
     try {
-        const [list_rental] = await db.execute(`SELECT ct.*, c.carname, u.fullname, u.phone_number, rent.fullname AS rent_fullname, p.amount AS amount
+        const [list_rental] = await db.execute(`SELECT ct.*, c.carname, u.fullname, u.phone_number, rent.fullname AS rent_fullname, 
+                                                IFNULL(SUM(p.amount), 0) AS amount
                                                 FROM Contracts ct 
                                                 JOIN Cars c ON ct.carID = c.carID
                                                 JOIN Users u ON u.userID = c.userID
                                                 JOIN Users rent ON rent.userID = ct.userID
                                                 LEFT JOIN Payments p ON p.contractID = ct.contractID
-                                                WHERE ct.userID = ?`, [userID]);
+                                                WHERE ct.userID = ?
+                                                GROUP BY ct.contractID`, [userID]);
         res.status(200).json(list_rental);
     } catch (err) {
         console.error(err);
@@ -131,10 +137,21 @@ exports.confirmContract = async (req, res) => {
             [car_status, carID]
         );
 
+        // Từ chối các hợp đồng trùng lịch
+        await conn.execute(`
+            UPDATE Contracts
+            SET contract_status = 'cancelled'
+            WHERE carID = ?
+              AND contractID != ?
+              AND contract_status = 'pending'
+              AND NOT (rental_end_date < ? OR rental_start_date > ?)
+        `, [carID, contractID, contract.rental_start_date, contract.rental_end_date]);
+
+        // Gửi thông báo cho người thuê
         function formatDate(date) {
             const d = new Date(date);
             const day = String(d.getDate()).padStart(2, '0');
-            const month = String(d.getMonth() + 1).padStart(2, '0'); 
+            const month = String(d.getMonth() + 1).padStart(2, '0');
             const year = d.getFullYear();
             return `${day}/${month}/${year}`;
         }
@@ -157,6 +174,7 @@ exports.confirmContract = async (req, res) => {
         conn.release();
     }
 };
+
 
 
 exports.rejectContract = async (req, res) => {

@@ -225,6 +225,19 @@ exports.updateCar = async (req, res) => {
             return res.status(404).json({ message: "Find not car or no owner" });
         }
 
+        if (car_status === 'maintenance') {
+            const [contracts] = await db.execute(`
+                SELECT * FROM Contracts
+                WHERE carID = ? AND contract_status IN ('pending', 'active')
+            `, [carID]);
+
+            if (contracts.length > 0) {
+                return res.status(400).json({
+                    message: "Không thể chuyển xe sang trạng thái bảo trì do đang có hợp đồng chưa hoàn tất"
+                });
+            }
+        }
+
         await db.execute(`UPDATE Cars SET 
             carname=?, license_plate=?, year_manufacture=?, seats=?, fuel_type=?, car_status=?, pickup_location=?, price_per_date=?, brandID=?
             WHERE carID=? and userID=?`,
@@ -299,3 +312,19 @@ exports.getSimilarCars = async (req, res) => {
     }
 }
 
+exports.getCarRentedPeriods = async (req, res) => {
+    const carID = req.params.id;
+
+    try {
+        const [contracts] = await db.execute(`
+            SELECT rental_start_date, rental_end_date
+            FROM Contracts
+            WHERE carID = ? AND contract_status = 'active'
+        `, [carID]);
+
+        res.status(200).json(contracts);
+    } catch (err) {
+        console.error("Lỗi khi lấy danh sách thời gian thuê xe:", err);
+        res.status(500).json({ message: "Lỗi server" });
+    }
+};

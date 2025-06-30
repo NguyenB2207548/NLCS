@@ -29,7 +29,7 @@ const PaymentModal = ({ show, handleClose, contractID, contract, onPaymentSucces
 
         // STRIPE
         if (paymentMethod === 'stripe') {
-            
+
             try {
                 const res = await fetch('http://localhost:3000/pay/stripe/create-checkout-session', {
                     method: 'POST',
@@ -39,7 +39,7 @@ const PaymentModal = ({ show, handleClose, contractID, contract, onPaymentSucces
                     },
                     body: JSON.stringify({ contractID: contractID })
                 });
-               
+
                 const data = await res.json();
 
                 if (res.ok && data.url) {
@@ -51,7 +51,7 @@ const PaymentModal = ({ show, handleClose, contractID, contract, onPaymentSucces
                 console.error("Stripe payment error:", err);
                 setError("Lỗi kết nối tới Stripe");
             } finally {
-                setLoading(false); 
+                setLoading(false);
             }
             return;
         }
@@ -71,7 +71,7 @@ const PaymentModal = ({ show, handleClose, contractID, contract, onPaymentSucces
 
             const data = await res.json();
 
-            if (res.ok && data.message === "Pay successfully") {
+            if (res.ok) {
                 onPaymentSuccess();
                 handleClose();
             } else {
@@ -118,16 +118,18 @@ const PaymentModal = ({ show, handleClose, contractID, contract, onPaymentSucces
                         </Form.Select>
                     </Form.Group>
 
-                    <Form.Group className="mt-3">
-                        <Form.Label>Số tiền thanh toán</Form.Label>
-                        <Form.Control
-                            type="number"
-                            placeholder="Nhập số tiền (VND)"
-                            value={amount}
-                            onChange={(e) => setAmount(e.target.value)}
-                            min={0}
-                        />
-                    </Form.Group>
+                    {paymentMethod === 'cash' && (
+                        <Form.Group className="mt-3">
+                            <Form.Label>Số tiền thanh toán</Form.Label>
+                            <Form.Control
+                                type="number"
+                                placeholder="Nhập số tiền (VND)"
+                                value={amount}
+                                onChange={(e) => setAmount(e.target.value)}
+                                min={0}
+                            />
+                        </Form.Group>
+                    )}
                 </Form>
             </Modal.Body>
             <Modal.Footer>

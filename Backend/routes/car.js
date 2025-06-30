@@ -17,5 +17,6 @@ router.put('/:id', auth, carController.updateCar);
 router.get('/getStatsOfUser', auth, carController.getStatsOfUser);
 router.get('/admin/getAllCarStats', auth, admin, carController.getAllCarStats);
 router.get('/similarCars/:id', carController.getSimilarCars);
+router.get('/rentedPeriods/:id', carController.getCarRentedPeriods);
 
 module.exports = router;

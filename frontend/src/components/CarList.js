@@ -11,7 +11,7 @@ const CarList = ({ filters = {} }) => {
     if (filters.location) queryParams.append('pickup_location', filters.location);
     if (filters.seat) queryParams.append('seats', filters.seat);
     if (filters.brand) queryParams.append('brandname', filters.brand);
-    queryParams.append('car_status', 'available');
+    // queryParams.append('car_status', 'available');
 
     fetch(`http://localhost:3000/car?${queryParams.toString()}`)
       .then((res) => res.json())

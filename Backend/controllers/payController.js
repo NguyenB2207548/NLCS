@@ -3,60 +3,69 @@ require('dotenv').config();
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 exports.payContract = async (req, res) => {
-
     const userID = req.user.id;
     const contractID = req.params.id;
     const { payment_method, amount } = req.body;
-    let payment_status = 'pending';
+    const paidAmount = parseFloat(amount);
+
     try {
-        const [contract] = await db.execute('SELECT * FROM Contracts WHERE contractID = ? and userID = ?', [contractID, userID]);
+        // Kiểm tra hợp đồng có tồn tại và thuộc về người dùng
+        const [[contract]] = await db.execute(
+            'SELECT * FROM Contracts WHERE contractID = ? AND userID = ?',
+            [contractID, userID]
+        );
 
-        if (contract.length === 0) {
-            return res.status(400).json({ message: "Not found contract or no renter" });
+        if (!contract) {
+            return res.status(400).json({ message: "Không tìm thấy hợp đồng hoặc không phải người thuê" });
         }
 
-        if (contract[0].contract_status !== 'active') {
-            return res.status(400).json({ message: "Contract is not confirm" });
+        if (contract.contract_status !== 'active') {
+            return res.status(400).json({ message: "Hợp đồng chưa được xác nhận" });
         }
 
-        const total_price = contract[0].total_price;
+        // Lưu thanh toán mới
+        await db.execute(`
+            INSERT INTO Payments (payment_method, total_price, payment_status, amount, contractID)
+            VALUES (?, ?, ?, ?, ?)`,
+            [payment_method, contract.total_price, 'pending', paidAmount, contractID]
+        );
 
-        const [existing] = await db.execute('SELECT * FROM Payments WHERE contractID = ?', [contractID]);
-        if (existing.length === 0) {
-            if (amount >= total_price) {
-                payment_status = 'completed';
-            }
-            await db.execute(`INSERT INTO Payments(payment_method, total_price, payment_status, amount, contractID)
-                VALUES(?, ?, ?, ?, ?)`, [payment_method, total_price, payment_status, amount, contractID]);
-        } else {
-            const amount_total = parseFloat(amount) + parseFloat(existing[0].amount);
-            if (amount_total >= total_price) {
-                payment_status = 'completed';
-            }
-            await db.execute(`UPDATE Payments 
-                SET amount = ?, payment_status = ?, payment_date = ? 
-                WHERE contractID = ?`, [amount_total, payment_status, new Date(), contractID]);
-        }
+        // Tính tổng tiền đã thanh toán cho hợp đồng này
+        const [[sum]] = await db.execute(`
+            SELECT COALESCE(SUM(amount), 0) AS totalPaid 
+            FROM Payments 
+            WHERE contractID = ?`,
+            [contractID]
+        );
 
-        if (payment_status === 'completed') {
+        // Nếu thanh toán đủ
+        if (sum.totalPaid >= contract.total_price) {
+            // Cập nhật trạng thái hợp đồng và xe
             await db.execute(
                 `UPDATE Contracts SET contract_status = 'completed' WHERE contractID = ?`,
                 [contractID]
             );
 
-            const carID = contract[0].carID;
             await db.execute(
                 `UPDATE Cars SET car_status = 'available' WHERE carID = ?`,
-                [carID]
+                [contract.carID]
+            );
+
+            // Cập nhật tất cả bản ghi payment thành 'completed'
+            await db.execute(
+                `UPDATE Payments SET payment_status = 'completed' WHERE contractID = ?`,
+                [contractID]
             );
         }
 
-        res.status(200).json({ message: "Pay successfully" });
+        res.status(200).json({ message: "Thanh toán thành công" });
+
     } catch (err) {
-        console.error(err);
+        console.error("Lỗi khi thanh toán:", err);
         res.status(500).json({ message: "Lỗi server khi thanh toán" });
     }
-}
+};
+
 
 exports.getPaidContract = async (req, res) => {
     const userID = req.user.id;
@@ -120,10 +129,15 @@ exports.createCheckout = async (req, res) => {
 
     try {
         const [contracts] = await db.execute(`
-            SELECT ct.total_price, c.carname 
+            SELECT 
+                ct.total_price, 
+                c.carname, 
+                IFNULL(SUM(p.amount), 0) AS paid_amount
             FROM Contracts ct
             JOIN Cars c ON ct.carID = c.carID
+            LEFT JOIN Payments p ON p.contractID = ct.contractID
             WHERE ct.contractID = ?
+            GROUP BY ct.contractID
         `, [contractID]);
 
         if (!contracts || contracts.length === 0) {
@@ -131,6 +145,12 @@ exports.createCheckout = async (req, res) => {
         }
 
         const contract = contracts[0];
+
+        const unpaidAmount = contract.total_price - contract.paid_amount;
+
+        if (unpaidAmount <= 0) {
+            return res.status(400).json({ message: "Hợp đồng đã được thanh toán đủ" });
+        }
 
         const session = await stripe.checkout.sessions.create({
             payment_method_types: ['card'],
@@ -141,7 +161,7 @@ exports.createCheckout = async (req, res) => {
                     product_data: {
                         name: `Thuê xe: ${contract.carname}`,
                     },
-                    unit_amount: Math.round(contract.total_price / 27000 * 100),
+                    unit_amount: Math.round(unpaidAmount / 27000 * 100), // chuyển sang cent (USD)
                 },
                 quantity: 1,
             }],
@@ -152,7 +172,6 @@ exports.createCheckout = async (req, res) => {
             cancel_url: `http://localhost:5000/payment-cancel`,
         });
 
-        // Trả về URL để client redirect đến Stripe
         res.json({ url: session.url });
 
     } catch (err) {
@@ -160,6 +179,7 @@ exports.createCheckout = async (req, res) => {
         res.status(500).json({ message: "Server Error khi tạo phiên thanh toán" });
     }
 };
+
 
 
 // Thanh toan online

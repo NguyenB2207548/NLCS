@@ -32,7 +32,12 @@ const CarDetail = () => {
 
         <h2 className="fw-bold mb-3">{car.carname}</h2>
         <div className="mb-3">
-          <span className="badge bg-light text-dark">Giao xe tận nơi</span>
+          {car?.car_status === 'available' && (
+            <span className="badge bg-success-subtle text-success">Xe sẵn sàng cho thuê</span>
+          )}
+          {car?.car_status === 'maintenance' && (
+            <span className="badge bg-warning-subtle text-warning">Xe đang bảo trì</span>
+          )}
         </div>
 
         <Row>
@@ -98,7 +103,7 @@ const CarDetail = () => {
           </Col>
         </Row>
 
-        
+
 
         <RentalModal
           show={showRentalModal}
@@ -113,34 +118,34 @@ const CarDetail = () => {
       </Container>
 
       <div ref={suggestionsRef}>
-          {suggestions.length > 0 && (
-            <>
-              <h4 className="mt-5 fw-bold">Gợi ý xe tương tự</h4>
-              <Row className="mt-3">
-                {suggestions.map((item) => (
-                  <Col md={3} sm={6} key={item.carID} className="mb-4">
-                    <Link to={`/car/detail/${item.carID}`} className="text-decoration-none text-dark">
-                      <div className="border rounded shadow-sm h-100">
-                        <img
-                          src={`http://localhost:3000/uploads/${item.img_URL}`}
-                          alt={item.carname}
-                          className="w-100 rounded-top"
-                          style={{ height: '160px', objectFit: 'cover' }}
-                        />
-                        <div className="p-2">
-                          <h6 className="fw-bold mb-1">{item.carname}</h6>
-                          <p className="mb-0 text-muted">{item.price_per_date.toLocaleString()}đ/ngày</p>
-                          <p className="mb-0 text-muted">{item.pickup_location}</p>
-                          <p className="mb-0 text-muted">{item.seats} chỗ</p>
-                        </div>
+        {suggestions.length > 0 && (
+          <>
+            <h4 className="mt-5 fw-bold">Gợi ý xe tương tự</h4>
+            <Row className="mt-3">
+              {suggestions.map((item) => (
+                <Col md={3} sm={6} key={item.carID} className="mb-4">
+                  <Link to={`/car/detail/${item.carID}`} className="text-decoration-none text-dark">
+                    <div className="border rounded shadow-sm h-100">
+                      <img
+                        src={`http://localhost:3000/uploads/${item.img_URL}`}
+                        alt={item.carname}
+                        className="w-100 rounded-top"
+                        style={{ height: '160px', objectFit: 'cover' }}
+                      />
+                      <div className="p-2">
+                        <h6 className="fw-bold mb-1">{item.carname}</h6>
+                        <p className="mb-0 text-muted">{item.price_per_date.toLocaleString()}đ/ngày</p>
+                        <p className="mb-0 text-muted">{item.pickup_location}</p>
+                        <p className="mb-0 text-muted">{item.seats} chỗ</p>
                       </div>
-                    </Link>
-                  </Col>
-                ))}
-              </Row>
-            </>
-          )}
-        </div>
+                    </div>
+                  </Link>
+                </Col>
+              ))}
+            </Row>
+          </>
+        )}
+      </div>
     </div>
   );
 };

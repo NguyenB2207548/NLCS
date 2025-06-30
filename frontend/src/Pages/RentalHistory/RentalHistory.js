@@ -130,15 +130,20 @@ const RentalHistory = () => {
                                         {item.contract_status === 'pending' && (
                                             <Button variant="danger" size="sm" onClick={() => cancelContract(item.contractID)}>Hủy đơn</Button>
                                         )}
+
                                         {item.contract_status === 'active' && (
-                                            <Button
-                                                variant="primary"
-                                                size="sm"
-                                                onClick={() => openPaymentModal(item)}
-                                            >
-                                                Thanh toán
-                                            </Button>
+                                            <>
+                                                <Button
+                                                    variant="primary"
+                                                    size="sm"
+                                                    onClick={() => openPaymentModal(item)}
+                                                >
+                                                    {Number(item.amount || 0) > 0 ? 'Thanh toán thêm' : 'Thanh toán'}
+                                                </Button>
+                                            </>
                                         )}
+
+
                                         {(item.contract_status === 'completed' || item.contract_status === 'cancelled') && (
                                             <Button
                                                 variant="outline-danger"
