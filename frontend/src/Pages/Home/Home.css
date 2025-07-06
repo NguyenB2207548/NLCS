@@ -20,7 +20,8 @@
 
 .button-timkiem {
   background-color: #043c78 !important;
-  
+  margin-bottom: 4px;
+  margin-top: 4px;
 }
 
 .button-timkiem:hover {
@@ -30,6 +31,9 @@
 
 .select-filter {
   transition: box-shadow 0.2s ease, border-color 0.2s ease;
+  /* width: 100%; */
+  margin-bottom: 4px; 
+  margin-top: 4px;
 }
 
 .select-filter:hover {
@@ -37,4 +41,3 @@
   box-shadow: 0 0 5px rgba(13, 110, 253, 0.5);
   cursor: pointer;
 }
-
