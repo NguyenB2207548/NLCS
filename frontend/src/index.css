@@ -6,11 +6,16 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   /* font-family: Exo, sans-serif !important; */
-   font-family: 'Poppins', sans-serif !important;
-
+   /* font-family: 'Poppins', sans-serif !important; */
+  
 }
 
 header {
   width: 100%;
 }
 
+.container {
+  max-width: 100% !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}

@@ -1,28 +1,29 @@
-import React from 'react';
-import { Container } from 'react-bootstrap';
-import { Routes, Route } from 'react-router-dom';
-import Header from './components/Header/Header';
-import Home from './Pages/Home/Home'
-import Footer from './components/Footer/Footer';
-import CarDetail from './Pages/Details/CarDetail';
-import AddCar from './Pages/AddCar/AddCar';
-import Profile from './Pages/Profile/Profile';
-import CreateRental from './Pages/Rental/Rental';
-import RentalHistory from './Pages/RentalHistory/RentalHistory';
-import AdminPage from './Pages/Admin/AdminPage';
-import Users from './Pages/Admin/Users';
-import Cars from './Pages/Admin/Cars';
-import Contracts from './Pages/Admin/Contracts';
-import Dashboard from './Pages/Admin/Dashboard';
-import PaymentSuccess from './Pages/Payment/PaymentSuccess';
-import PaymentCancel from './Pages/Payment/PaymentCancel';
+import React from "react";
+import { Container } from "react-bootstrap";
+import { Routes, Route, useLocation } from "react-router-dom";
+import Header from "./components/Header/Header";
+import Home from "./Pages/Home/Home";
+import Footer from "./components/Footer/Footer";
+import CarDetail from "./Pages/Details/CarDetail";
+import AddCar from "./Pages/AddCar/AddCar";
+import Profile from "./Pages/Profile/Profile";
+import CreateRental from "./Pages/Rental/Rental";
+import RentalHistory from "./Pages/RentalHistory/RentalHistory";
+import AdminPage from "./Pages/Admin/AdminPage";
+import Users from "./Pages/Admin/Users";
+import Cars from "./Pages/Admin/Cars";
+import Contracts from "./Pages/Admin/Contracts";
+import Dashboard from "./Pages/Admin/Dashboard";
+import PaymentSuccess from "./Pages/Payment/PaymentSuccess";
+import PaymentCancel from "./Pages/Payment/PaymentCancel";
+import Products from "./Pages/Product/product";
 
 function App() {
+  const location = useLocation();
+  const isAdminRoute = location.pathname.startsWith("/admin");
   return (
-    <Container fluid>
-      <header >
-        <Header />
-      </header>
+    <div>
+      {!isAdminRoute && <Header />}
 
       <main>
         <Routes>
@@ -32,6 +33,7 @@ function App() {
           <Route path="/profile" element={<Profile />} />
           <Route path="/rental/:id" element={<CreateRental />} />
           <Route path="/rental/history" element={<RentalHistory />} />
+          <Route path="/products" element={<Products />} />
 
           <Route path="/admin" element={<AdminPage />}>
             <Route index element={<Dashboard />} />
@@ -43,14 +45,11 @@ function App() {
 
           <Route path="/payment-success" element={<PaymentSuccess />} />
           <Route path="/payment-cancel" element={<PaymentCancel />} />
-
         </Routes>
       </main>
 
-      <footer>
-        <Footer />
-      </footer>
-    </Container>
+      {!isAdminRoute && <Footer />}
+    </div>
   );
 }
 

@@ -1,0 +1,36 @@
+.layout {
+    display: flex;
+}
+.sidebar {
+    background-color: #043c78;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid #ccc;
+    min-height: 100vh;
+    /* Viền ngăn cách */
+}
+
+.sidebar .nav-link {
+    color: #fff;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    /* Viền nhẹ dưới menu */
+    padding: 10px 15px;
+}
+
+.sidebar .nav-link:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    /* Hover highlight */
+}
+
+.sidebar .navbar-brand {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    /* Viền dưới tiêu đề */
+    padding-bottom: 10px;
+}
+
+.sidebar {
+    position: sticky;
+    top: 0;
+    align-self: flex-start;
+}

@@ -423,3 +423,27 @@ exports.getCarRentedPeriods = async (req, res) => {
     res.status(500).json({ message: "Lỗi server" });
   }
 };
+
+exports.getLuxuryCars = async (req, res) => {
+  try {
+    const [cars] = await db.execute(
+      `SELECT * FROM Cars ORDER BY price_per_date DESC LIMIT 4`
+    );
+    res.status(200).json(cars);
+  } catch (err) {
+    console.error("Lỗi:", err);
+    res.status(500).json({ message: "Lỗi server" });
+  }
+};
+
+exports.getCheapCars = async (req, res) => {
+  try {
+    const [cars] = await db.execute(
+      `SELECT * FROM Cars ORDER BY price_per_date ASC LIMIT 4`
+    );
+    res.status(200).json(cars);
+  } catch (err) {
+    console.error("Lỗi:", err);
+    res.status(500).json({ message: "Lỗi server" });
+  }
+};

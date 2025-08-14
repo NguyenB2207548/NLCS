@@ -1,135 +1,153 @@
 import React, { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
 import "./Home.css";
-import CarList from "../../components/CarList";
-import { Button, Form } from "react-bootstrap";
+import { Button } from "react-bootstrap";
+import CarCard from "../../components/CarCard"; // Bạn tạo CarCard hiển thị 1 xe
+import { Link } from "react-router-dom";
+import img_home from "../../assets/img_homepage.jpg";
 
 const Home = () => {
-  const [location, setLocation] = useState("");
-  const [seat, setSeat] = useState("");
-  const [brand, setBrand] = useState("");
-  const [filters, setFilters] = useState({});
-  const [brands, setBrands] = useState([]);
-  const [sort, setSort] = useState("");
+  const [luxuryCars, setLuxuryCars] = useState([]);
+  const [cheapCars, setCheapCars] = useState([]);
 
-  useEffect(() => {
-    const fetchBrands = async () => {
-      try {
-        const res = await fetch("http://localhost:3000/brand/getAll");
-        const data = await res.json();
-        setBrands(data);
-      } catch (error) {
-        console.error("Lỗi khi lấy danh sách hãng xe:", error);
-      }
-    };
-
-    fetchBrands();
-  }, []);
-
-  const handleSearch = () => {
-    setFilters({
-      location,
-      seat,
-      brand,
-      sort,
-    });
+  // Lấy xe cao cấp
+  const fetchLuxuryCars = async () => {
+    try {
+      const res = await fetch("http://localhost:3000/car/getLuxuryCars");
+      const data = await res.json();
+      setLuxuryCars(data);
+    } catch (err) {
+      console.error("Lỗi khi lấy xe cao cấp:", err);
+    }
   };
 
-  const locationState = useLocation();
+  // Lấy xe giá rẻ
+  const fetchCheapCars = async () => {
+    try {
+      const res = await fetch("http://localhost:3000/car/getCheapCars");
+      const data = await res.json();
+      setCheapCars(data);
+    } catch (err) {
+      console.error("Lỗi khi lấy xe giá rẻ:", err);
+    }
+  };
 
   useEffect(() => {
-    if (locationState.state?.reset) {
-      setLocation("");
-      setSeat("");
-      setBrand("");
-      setFilters({});
-      setSort("");
-
-      window.history.replaceState({}, document.title);
-    }
-  }, [locationState]);
+    fetchLuxuryCars();
+    fetchCheapCars();
+  }, []);
 
   return (
-    <div className="">
-      <Form
-        className="filter-form gx-2 gy-2 py-3 px-2 bg-light rounded-4 shadow-sm mb-3 "
-        //
+    <div>
+      {/* Hero section */}
+      <section
+        className="hero text-white text-center d-flex align-items-center justify-content-center"
+        style={{
+          backgroundImage: `url(${img_home})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          minHeight: "80vh",
+          position: "relative",
+        }}
       >
-        <div className="row mx-auto" style={{ maxWidth: "1000px" }}>
-          <div className="col-12 col-sm-6 col-md-2">
-            <Form.Select
-              className="select-filter"
-              aria-label="Vị trí"
-              onChange={(e) => setLocation(e.target.value)}
-              value={location}
-            >
-              <option value="">Tất cả vị trí</option>
-              <option value="Hồ Chí Minh">Hồ Chí Minh</option>
-              <option value="Hà Nội">Hà Nội</option>
-              <option value="Đà Nẵng">Đà Nẵng</option>
-              <option value="Cần Thơ">Cần Thơ</option>
-            </Form.Select>
-          </div>
+        <div
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: "linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.3))",
+          }}
+        ></div>
 
-          <div className="col-12 col-sm-6 col-md-3">
-            <Form.Select
-              className="select-filter"
-              aria-label="Số chỗ"
-              onChange={(e) => setSeat(e.target.value)}
-              value={seat}
-            >
-              <option value="">Tất cả số chỗ</option>
-              <option value="4">4 chỗ</option>
-              <option value="5">5 chỗ</option>
-              <option value="7">7 chỗ</option>
-              <option value="9">9 chỗ</option>
-              <option value="16">16 chỗ</option>
-            </Form.Select>
-          </div>
+        <div style={{ position: "relative", zIndex: 1 }}>
+          <h1
+            className="display-4 fw-bold mb-4"
+            style={{
+              fontSize: "3rem",
+              fontWeight: "bold",
+              textShadow: "2px 2px 8px rgba(0,0,0,0.7)",
+            }}
+          >
+            Chào mừng đến với hệ thống thuê xe du lịch
+          </h1>
+          <p className="lead">
+            Khám phá hàng trăm mẫu xe đa dạng, đặt xe nhanh chóng và an toàn
+            tuyệt đối.
+          </p>
+          <Link
+            to="/products"
+            style={{
+              backgroundColor: "#ffc107",
+              color: "#000",
+              padding: "12px 28px",
+              border: "none",
+              borderRadius: "50px",
+              fontSize: "1.1rem",
+              transition: "all 0.3s ease",
+              display: "inline-block", // giữ form giống nút
+              textDecoration: "none",
+              textAlign: "center",
+            }}
+          >
+            Bắt đầu khám phá
+          </Link>
+        </div>
+      </section>
 
-          <div className="col-12 col-sm-6 col-md-2">
-            <Form.Select
-              className="select-filter"
-              aria-label="Hãng xe"
-              onChange={(e) => setBrand(e.target.value)}
-              value={brand}
-            >
-              <option value="">Tất cả hãng</option>
-              {brands.map((b) => (
-                <option key={b.brandID} value={b.brandname}>
-                  {b.brandname}
-                </option>
-              ))}
-            </Form.Select>
-          </div>
-
-          <div className="col-12 col-sm-6 col-md-3">
-            <Form.Select
-              className="select-filter"
-              aria-label="Sắp xếp theo giá"
-              onChange={(e) => setSort(e.target.value)}
-              value={sort}
-            >
-              <option value="">Sắp xếp theo giá</option>
-              <option value="asc">Giá tăng dần</option>
-              <option value="desc">Giá giảm dần</option>
-            </Form.Select>
-          </div>
-
-          <div className="col-12 col-md-2">
-            <div className="d-grid">
-              <Button
-                className="form-control button-timkiem"
-                onClick={handleSearch}
-              >
-                Tìm kiếm
-              </Button>
-            </div>
+      {/* Xe cao cấp */}
+      <section className="py-5 xecaocap">
+        <h2
+          className="mb-4 fw-bold text-center"
+          style={{
+            fontSize: "2.2rem",
+            // color: "#ff6f00",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: "10px",
+          }}
+        >
+          <span style={{ fontSize: "2.4rem" }}>🚗</span>
+          Xe cao cấp
+        </h2>
+        <div className="container">
+          <div className="row">
+            {luxuryCars.map((car) => (
+              <div key={car.carID} className="col-md-3 mb-4">
+                <CarCard car={car} />
+              </div>
+            ))}
           </div>
         </div>
-      </Form>
+      </section>
 
-      <CarList filters={filters} />
+      {/* Xe giá rẻ */}
+      <section className="py-4 xegiare">
+        <h2
+          className="mb-4 fw-bold text-center"
+          style={{
+            fontSize: "2.2rem",
+            // color: "#0077b6",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: "10px",
+          }}
+        >
+          <span style={{ fontSize: "2.4rem" }}>💰</span>
+          Xe giá rẻ
+        </h2>
+        <div className="container">
+          <div className="row">
+            {cheapCars.map((car) => (
+              <div key={car.carID} className="col-md-3 mb-4">
+                <CarCard car={car} />
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
     </div>
   );
 };

@@ -1,42 +1,65 @@
-.nav-header {
-  --header-text-color: #043c78;
-  color: var(--header-text-color);
-  background-color: #fff;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  padding-top: 8px;
-  padding-bottom: 8px;
-}
+/* =========================
+   Thanh menu (Navbar)
+========================= */
+/* Logo */
 
-.nav-header .navbar-brand,
+
+/* Link trong menu */
+.nav-links .nav-link,
 .nav-header .nav-link {
-  color: var(--header-text-color) !important;
-  font-weight: 500;
-
+  font-weight: 600;
+  padding: 8px 12px;
+  margin: 0 6px;
 }
 
+.nav-links .nav-link:hover,
+.nav-header .nav-link:hover {
+  color: #ffc107 !important;
+  border-bottom: 2px solid #ffc107;
+}
+
+/* Text-nav riêng */
 .text-nav {
   font-size: 15px !important;
-  font-weight: 100px !important;
-  margin-left: 12px;
-  margin-right: 12px;
+  margin: 0 12px;
 }
 
-.text-nav:hover {
-  text-decoration: underline;
+/* Icon chuông */
+.icon-bell {
+  /* color: #0d47a1;
+  transition: transform 0.2s ease; */
+  /* transition: all 0.3s ease; */
+  transition: color 0.2s ease, border-bottom-color 0.2s ease;
 }
 
-.icon-login {
-  font-size: 30px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-bottom: 5px;
+.icon-bell:hover {
+  transform: scale(1.1);
 }
 
+/* Dropdown user */
+.dropdown-toggle-user {
+  font-weight: 500;
+  /* color: #0d3b66 !important; */
+}
+
+.dropdown-toggle-user i {
+  font-size: 1.5rem;
+  /* color: #0d3b66; */
+}
+
+/* Nút quay lại quản trị */
+.btn-admin-back {
+  font-weight: 500;
+  border-radius: 20px;
+  padding: 5px 12px;
+}
+
+/* =========================
+   Modal + Input + Button
+========================= */
 .modal {
   border-radius: 12px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-  /* background-color: blue; */
 }
 
 .modal-content {
@@ -44,9 +67,10 @@
   flex-direction: column;
   gap: 16px;
   padding: 24px;
+  border-radius: 16px;
+  box-shadow: 0 5px 30px rgba(0, 0, 0, 0.15);
 }
 
-/* Tăng độ đẹp cho input */
 .form-control {
   border-radius: 8px;
   padding: 10px 12px;
@@ -60,14 +84,7 @@
   box-shadow: 0 0 0 0.15rem rgba(74, 144, 226, 0.25);
 }
 
-/* Modal đẹp hơn */
-.modal-content {
-  border-radius: 16px;
-  box-shadow: 0 5px 30px rgba(0, 0, 0, 0.15);
-  padding-top: 12px;
-}
-
-/* Nút bấm */
+/* Nút */
 button.btn-primary {
   background-color: #1a73e8;
   border-radius: 8px;
@@ -84,4 +101,21 @@ button.btn-secondary {
 
 .alert-danger {
   font-size: 14px;
+}
+/* img {
+  height: 50px;
+  width: auto;
+  object-fit: contain;
+} */
+
+.navbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  /* khoảng cách logo - text nếu có */
+}
+.fullname {
+  color: rgba(0, 0, 0, 0.65);
+  font-weight: 600;
+  /* font-size: 20px; */
 }
