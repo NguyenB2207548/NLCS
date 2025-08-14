@@ -13,3 +13,35 @@
   display: inline-block;
   color: #0d6efd;
 }
+
+.sidebar-profile {
+  width: 250px;
+  height: 100%;
+  /* padding: 20px; */
+  position: sticky;
+  top: 0;
+  align-self: flex-start;
+}
+
+.sidebar-profile .nav-link {
+  border-bottom: 1px solid #b0bec5;
+  padding-bottom: 10px;
+}
+
+.sidebar-profile .navbar-brand {
+  border-bottom: 1px solid #b0bec5;
+  padding-bottom: 10px;
+}
+.min-width-card {
+  min-height: 107px;
+}
+
+.custom-table td,
+.custom-table th {
+  border-color: #dee2e6;
+}
+
+.custom-table th {
+  background: #343a40 !important;
+  color: #ffffff;
+}

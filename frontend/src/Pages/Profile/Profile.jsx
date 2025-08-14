@@ -3,10 +3,9 @@ import { Container, Nav, Navbar } from "react-bootstrap";
 import UserProfile from "./UserProfile";
 import CarProfile from "./CarProfile";
 import ContractProfile from "./ContractProfile";
-import RevenueProfile from "./RevenueProfile";
-
+import "./Profile.css";
 const Profile = () => {
-  const [activeSection, setActiveSection] = useState("user"); // mặc định là Thông tin người dùng
+  const [activeSection, setActiveSection] = useState("user");
 
   const renderContent = () => {
     switch (activeSection) {
@@ -16,24 +15,27 @@ const Profile = () => {
         return <CarProfile />;
       case "contract":
         return <ContractProfile />;
-      case "revenue":
-        return <RevenueProfile />;
       default:
         return <UserProfile />;
     }
   };
 
   return (
-    <div className="d-flex">
+    <div
+      className="d-flex"
+      style={{ background: "linear-gradient(to right, #F5F5F5, #E0F7FA)" }}
+    >
       <div
         style={{
           minWidth: "200px",
-          backgroundColor: "#f8f9fa",
           minHeight: "100vh",
         }}
+        className="sidebar-profile"
       >
         <Navbar className="flex-column p-3">
-          <Navbar.Brand>Trang cá nhân</Navbar.Brand>
+          <Navbar.Brand className="fw-bold fs-5 mb-3">
+            Trang cá nhân
+          </Navbar.Brand>
           <Nav className="flex-column">
             <Nav.Link
               onClick={() => setActiveSection("user")}
@@ -53,17 +55,11 @@ const Profile = () => {
             >
               Hợp đồng
             </Nav.Link>
-            <Nav.Link
-              onClick={() => setActiveSection("revenue")}
-              active={activeSection === "revenue"}
-            >
-              Doanh thu
-            </Nav.Link>
           </Nav>
         </Navbar>
       </div>
 
-      <Container className="p-4" fluid>
+      <Container className="p-4 content border" fluid>
         {renderContent()}
       </Container>
     </div>

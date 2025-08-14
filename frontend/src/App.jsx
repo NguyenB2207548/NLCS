@@ -17,6 +17,9 @@ import Dashboard from "./Pages/Admin/Dashboard";
 import PaymentSuccess from "./Pages/Payment/PaymentSuccess";
 import PaymentCancel from "./Pages/Payment/PaymentCancel";
 import Products from "./Pages/Product/product";
+import AboutPage from "./Pages/Footer/AboutPage";
+// import PolicyPage from "./Pages/Footer/PolicyPage";
+import ContactPage from "./Pages/Footer/ContactPage";
 
 function App() {
   const location = useLocation();
@@ -34,6 +37,9 @@ function App() {
           <Route path="/rental/:id" element={<CreateRental />} />
           <Route path="/rental/history" element={<RentalHistory />} />
           <Route path="/products" element={<Products />} />
+          <Route path="/about" element={<AboutPage />} />
+          {/* <Route path="/policy" element={<PolicyPage />} /> */}
+          <Route path="/contact" element={<ContactPage />} />
 
           <Route path="/admin" element={<AdminPage />}>
             <Route index element={<Dashboard />} />

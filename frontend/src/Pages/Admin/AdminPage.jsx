@@ -34,7 +34,7 @@ const AdminPage = () => {
         </Navbar>
 
         <div className="p-3">
-          <div className="fw-bold mb-2">adminO01</div>
+          <div className="fw-bold mb-2">{decoded.fullname || "Admin"}</div>
           <button
             className="btn btn-danger w-100 rounded-3"
             onClick={handleLogout}

@@ -1,43 +1,51 @@
-import React, { useEffect, useState } from 'react';
-import { Table, Button, Container, Row, Col, Card, Badge } from 'react-bootstrap';
+import React, { useEffect, useState } from "react";
+import {
+  Table,
+  Button,
+  Container,
+  Row,
+  Col,
+  Card,
+  Badge,
+} from "react-bootstrap";
 
 const Cars = () => {
   const [cars, setCars] = useState([]);
   const [stats, setStats] = useState(null);
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
 
     // Lấy danh sách xe
-    fetch('http://localhost:3000/admin/car/getAllCar', {
-      headers: { Authorization: `Bearer ${token}` }
+    fetch("http://localhost:3000/admin/car/getAllCar", {
+      headers: { Authorization: `Bearer ${token}` },
     })
-      .then(res => res.json())
-      .then(data => setCars(data))
-      .catch(err => console.error(err));
+      .then((res) => res.json())
+      .then((data) => setCars(data))
+      .catch((err) => console.error(err));
 
     // Lấy thống kê xe
-    fetch('http://localhost:3000/car/admin/getAllCarStats', {
-      headers: { Authorization: `Bearer ${token}` }
+    fetch("http://localhost:3000/car/admin/getAllCarStats", {
+      headers: { Authorization: `Bearer ${token}` },
     })
-      .then(res => res.json())
-      .then(data => setStats(data))
-      .catch(err => console.error('Lỗi khi lấy thống kê:', err));
+      .then((res) => res.json())
+      .then((data) => setStats(data))
+      .catch((err) => console.error("Lỗi khi lấy thống kê:", err));
   }, []);
 
   const handleDelete = (carID) => {
-    if (!window.confirm('Bạn có chắc chắn muốn xóa xe này?')) return;
+    if (!window.confirm("Bạn có chắc chắn muốn xóa xe này?")) return;
 
     fetch(`http://localhost:3000/admin/car/delete/${carID}`, {
-      method: 'DELETE',
+      method: "DELETE",
       headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`
-      }
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
     })
-      .then(res => res.json())
-      .then(data => {
-        if (data.message === 'Xóa thành công')
-          setCars(prev => prev.filter(car => car.carID !== carID));
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.message === "Xóa thành công")
+          setCars((prev) => prev.filter((car) => car.carID !== carID));
         else alert(data.message);
       });
   };
@@ -78,8 +86,15 @@ const Cars = () => {
                 <h5>Xe giá cao nhất</h5>
                 {stats.maxPriceCar ? (
                   <>
-                    <div><strong>{stats.maxPriceCar.carname}</strong></div>
-                    <div>{Number(stats.maxPriceCar.price_per_date).toLocaleString()}₫/ngày</div>
+                    <div>
+                      <strong>{stats.maxPriceCar.carname}</strong>
+                    </div>
+                    <div>
+                      {Number(
+                        stats.maxPriceCar.price_per_date
+                      ).toLocaleString()}
+                      ₫/ngày
+                    </div>
                   </>
                 ) : (
                   <div>Không có</div>
@@ -91,7 +106,7 @@ const Cars = () => {
       )}
 
       <Table striped bordered hover>
-        <thead>
+        <thead className="table-dark border-light">
           <tr>
             <th>ID</th>
             <th>Tên xe</th>
@@ -102,11 +117,12 @@ const Cars = () => {
             <th>Vị trí</th>
             <th>Giá/ngày</th>
             <th>Trạng thái</th>
+            <th>Ảnh</th>
             <th>Hành động</th>
           </tr>
         </thead>
         <tbody>
-          {cars.map(car => (
+          {cars.map((car) => (
             <tr key={car.carID}>
               <td>{car.carID}</td>
               <td>{car.carname}</td>
@@ -117,12 +133,33 @@ const Cars = () => {
               <td>{car.pickup_location}</td>
               <td>{Number(car.price_per_date).toLocaleString()}₫</td>
               <td>
-                {car.car_status === 'available' && <Badge bg="success">Sẵn sàng</Badge>}
-                {car.car_status === 'rented' && <Badge bg="warning" text="dark">Đang thuê</Badge>}
-                {car.car_status === 'maintenance' && <Badge bg="secondary">Đang bảo trì</Badge>}
+                {car.car_status === "available" && (
+                  <Badge bg="success">Sẵn sàng</Badge>
+                )}
+                {car.car_status === "rented" && (
+                  <Badge bg="warning" text="dark">
+                    Đang thuê
+                  </Badge>
+                )}
+                {car.car_status === "maintenance" && (
+                  <Badge bg="secondary">Đang bảo trì</Badge>
+                )}
               </td>
               <td>
-                <Button variant="danger" size="sm" onClick={() => handleDelete(car.carID)}>Xóa</Button>
+                <img
+                  src={`http://localhost:3000/uploads/${car.img_URL}`}
+                  alt={car.carname}
+                  width="80"
+                />
+              </td>
+              <td>
+                <Button
+                  variant="danger"
+                  size="sm"
+                  onClick={() => handleDelete(car.carID)}
+                >
+                  Xóa
+                </Button>
               </td>
             </tr>
           ))}

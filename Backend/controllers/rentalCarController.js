@@ -82,6 +82,18 @@ exports.cancelContract = async (req, res) => {
   }
 };
 
+// Xóa
+exports.deleteContract = async (req, res) => {
+  const id = req.params.id;
+
+  try {
+    await db.execute("DELETE FROM Contracts WHERE contractID = ?", [id]);
+    res.status(200).json({ message: "Xóa thành công" });
+  } catch (err) {
+    res.status(500).json({ mesage: "Server Error" });
+  }
+};
+
 exports.getContractOfUser = async (req, res) => {
   const userID = req.user.id;
 
@@ -105,6 +117,7 @@ exports.getContractOfUser = async (req, res) => {
   }
 };
 
+// duyet hop dong
 exports.confirmContract = async (req, res) => {
   const userID = req.user.id;
   const contractID = req.params.id;
@@ -198,6 +211,7 @@ exports.confirmContract = async (req, res) => {
   }
 };
 
+// Tu choi
 exports.rejectContract = async (req, res) => {
   const userID = req.user.id;
   const contractID = req.params.id;
