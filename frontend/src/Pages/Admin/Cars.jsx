@@ -108,7 +108,7 @@ const Cars = () => {
       <Table striped bordered hover>
         <thead className="table-dark border-light">
           <tr>
-            <th>ID</th>
+            <th>STT</th>
             <th>Tên xe</th>
             <th>Biển số</th>
             <th>Số chỗ</th>
@@ -122,9 +122,9 @@ const Cars = () => {
           </tr>
         </thead>
         <tbody>
-          {cars.map((car) => (
+          {cars.map((car, index) => (
             <tr key={car.carID}>
-              <td>{car.carID}</td>
+              <td>{index + 1}</td>
               <td>{car.carname}</td>
               <td>{car.license_plate}</td>
               <td>{car.seats}</td>

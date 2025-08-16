@@ -4,9 +4,10 @@ const payContractController = require("../controllers/payController");
 const auth = require("../middleware/auth");
 const admin = require("../middleware/admin");
 
-router.post("/:id", auth, payContractController.payContract);
+router.get("/revenue", payContractController.getRevenue);
 router.get("/paidContract", auth, payContractController.getPaidContract);
 router.get("/notPaidContract", auth, payContractController.getNotPaidContract);
+router.post("/:id", auth, payContractController.payContract);
 
 router.delete(
   "/deletePayment/:id",

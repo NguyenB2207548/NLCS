@@ -13,7 +13,10 @@ const CarList = ({ filters = {} }) => {
     if (filters.seat) queryParams.append("seats", filters.seat);
     if (filters.brand) queryParams.append("brandname", filters.brand);
     if (filters.sort) queryParams.append("sort", filters.sort);
-    // queryParams.append('car_status', 'available');
+
+    // startDate và endDate cũng nằm trong filters
+    if (filters.startDate) queryParams.append("startDate", filters.startDate);
+    if (filters.endDate) queryParams.append("endDate", filters.endDate);
 
     fetch(`http://localhost:3000/car?${queryParams.toString()}`)
       .then((res) => res.json())
@@ -50,6 +53,10 @@ const CarList = ({ filters = {} }) => {
                     className="w-100 button-xemchitiet"
                     as={Link}
                     to={`/car/detail/${car.carID}`}
+                    state={{
+                      startDate: filters.startDate,
+                      endDate: filters.endDate,
+                    }} // truyền sang trang chi tiết
                   >
                     Xem chi tiết
                   </Button>

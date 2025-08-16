@@ -1,5 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { Navbar, Nav, Container, Dropdown, Button } from "react-bootstrap";
+import {
+  Navbar,
+  Nav,
+  Container,
+  Dropdown,
+  Toast,
+  ToastContainer,
+} from "react-bootstrap";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { FaBell } from "react-icons/fa";
@@ -21,7 +28,10 @@ const Header = () => {
   const [loginError, setLoginError] = useState("");
   const [showNotiModal, setShowNotiModal] = useState(false);
   const [hasUnread, setHasUnread] = useState(false);
-  const [alertMessage, setAlertMessage] = useState(null);
+
+  // Toast state
+  const [alertMessage, setAlertMessage] = useState("");
+  const [showToast, setShowToast] = useState(false);
 
   const location = useLocation();
   const user = JSON.parse(localStorage.getItem("user"));
@@ -52,7 +62,7 @@ const Header = () => {
     socket.on("notification", (message) => {
       console.log("📢 Nhận thông báo:", message);
       setAlertMessage(message);
-      setTimeout(() => setAlertMessage(null), 7000);
+      setShowToast(true);
     });
 
     return () => {
@@ -205,7 +215,6 @@ const Header = () => {
             style={{ height: "40px", objectFit: "contain" }}
           />
         </Navbar.Brand>
-
         <Navbar.Toggle aria-controls="main-navbar-nav" />
         <Navbar.Collapse id="main-navbar-nav">
           {/* Menu trái */}
@@ -279,20 +288,31 @@ const Header = () => {
           </Nav>
         </Navbar.Collapse>
 
-        {/* Alert */}
-        {alertMessage && (
-          <div
-            className="alert alert-success"
-            style={{
-              position: "fixed",
-              top: "20px",
-              right: "20px",
-              zIndex: 9999,
+        {/* Toast Notification */}
+        <ToastContainer position="top-end" className="p-3">
+          <Toast
+            bg={
+              alertMessage === "Hợp đồng đã bị từ chối" ? "danger" : "success"
+            }
+            onClose={() => {
+              setShowToast(false);
+              setAlertMessage("");
             }}
+            show={showToast}
+            delay={7000}
+            autohide
           >
-            {alertMessage}
-          </div>
-        )}
+            <Toast.Header closeButton>
+              <strong className="me-auto">
+                {alertMessage === "Hợp đồng đã bị từ chối"
+                  ? "❌ Thông báo"
+                  : "✅ Thông báo"}
+              </strong>
+              <small>Vừa xong</small>
+            </Toast.Header>
+            <Toast.Body className="text-white">{alertMessage}</Toast.Body>
+          </Toast>
+        </ToastContainer>
 
         {/* Modals */}
         <LoginModal

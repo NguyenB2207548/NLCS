@@ -30,6 +30,11 @@ const AdminPage = () => {
             <Nav.Link href="/admin/users">👤 Người dùng</Nav.Link>
             <Nav.Link href="/admin/cars">🚗 Xe</Nav.Link>
             <Nav.Link href="/admin/contracts">📄 Hợp đồng</Nav.Link>
+            <Nav.Link href="/admin/statCar">📅 Lịch xe đang được thuê</Nav.Link>
+            <Nav.Link href="/admin/statContracts">
+              📊 Số hợp đồng theo tháng
+            </Nav.Link>
+            <Nav.Link href="/admin/statRevenue">📊 Thông kê doanh thu</Nav.Link>
           </Nav>
         </Navbar>
 

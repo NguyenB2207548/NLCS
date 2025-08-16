@@ -239,6 +239,15 @@ exports.rejectContract = async (req, res) => {
       [contract_status, contractID]
     );
 
+    const renterID = contracts[0].userID;
+    const message = "Hợp đồng đã bị từ chối";
+
+    req.sendNotification(renterID, message);
+    await db.execute(
+      "INSERT INTO Notifications (userID, message) VALUES (?, ?)",
+      [renterID, message]
+    );
+
     res.status(200).json({ message: "Đã từ chối hợp đồng" });
   } catch (err) {
     console.error(err);

@@ -1,45 +1,45 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Form, Button } from "react-bootstrap";
 import CarList from "../../components/CarList";
 
 const Products = () => {
   const [location, setLocation] = useState("");
   const [seat, setSeat] = useState("");
-  const [brand, setBrand] = useState("");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
   const [filters, setFilters] = useState({});
-  const [brands, setBrands] = useState([]);
-  const [sort, setSort] = useState("");
 
-  useEffect(() => {
-    const fetchBrands = async () => {
-      try {
-        const res = await fetch("http://localhost:3000/brand/getAll");
-        const data = await res.json();
-        setBrands(data);
-      } catch (error) {
-        console.error("Lỗi khi lấy danh sách hãng xe:", error);
-      }
-    };
-    fetchBrands();
-  }, []);
+  const handleSearch = (e) => {
+    e.preventDefault();
 
-  const handleSearch = () => {
-    setFilters({
-      location,
-      seat,
-      brand,
-      sort,
-    });
+    // validate ngày
+    if (startDate && !endDate) {
+      alert("Vui lòng chọn ngày kết thúc khi đã chọn ngày bắt đầu!");
+      return;
+    }
+
+    if (startDate && endDate && new Date(endDate) < new Date(startDate)) {
+      alert("Ngày kết thúc phải lớn hơn hoặc bằng ngày bắt đầu!");
+      return;
+    }
+
+    setFilters({ location, seat, startDate, endDate });
   };
 
   return (
     <div className="container py-4">
-      <Form className="filter-form gx-2 gy-2 py-3 px-2 bg-light rounded-4 shadow-sm mb-3">
-        <div className="row mx-auto" style={{ maxWidth: "1000px" }}>
-          <div className="col-12 col-sm-6 col-md-2">
+      <Form
+        className="filter-form gx-2 gy-2 p-4 bg-white rounded-4 shadow-sm mb-4 mx-auto"
+        onSubmit={handleSearch}
+        style={{ maxWidth: "800px" }}
+      >
+        {/* Hàng 1: vị trí + số chỗ */}
+        <div className="row g-3 mb-3">
+          <div className="col-12 col-md-6">
             <Form.Select
               onChange={(e) => setLocation(e.target.value)}
               value={location}
+              className="py-2"
             >
               <option value="">Tất cả vị trí</option>
               <option value="Hồ Chí Minh">Hồ Chí Minh</option>
@@ -49,8 +49,12 @@ const Products = () => {
             </Form.Select>
           </div>
 
-          <div className="col-12 col-sm-6 col-md-3">
-            <Form.Select onChange={(e) => setSeat(e.target.value)} value={seat}>
+          <div className="col-12 col-md-6">
+            <Form.Select
+              onChange={(e) => setSeat(e.target.value)}
+              value={seat}
+              className="py-2"
+            >
               <option value="">Tất cả số chỗ</option>
               <option value="4">4 chỗ</option>
               <option value="5">5 chỗ</option>
@@ -59,42 +63,45 @@ const Products = () => {
               <option value="16">16 chỗ</option>
             </Form.Select>
           </div>
+        </div>
 
-          <div className="col-12 col-sm-6 col-md-2">
-            <Form.Select
-              onChange={(e) => setBrand(e.target.value)}
-              value={brand}
+        {/* Hàng 2: ngày bắt đầu + ngày kết thúc */}
+        <div className="row g-3 mb-3">
+          <div className="col-12 col-md-6">
+            <Form.Control
+              type="date"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+              className="py-2"
+            />
+          </div>
+          <div className="col-12 col-md-6">
+            <Form.Control
+              type="date"
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+              className="py-2"
+              min={startDate || undefined} // chỉ cho phép chọn ngày >= startDate
+              required={!!startDate} // bắt buộc khi đã chọn ngày bắt đầu
+            />
+          </div>
+        </div>
+
+        {/* Hàng 3: nút tìm kiếm */}
+        <div className="row">
+          <div className="col-12 d-flex justify-content-center">
+            <Button
+              type="submit"
+              className="btn fw-bold rounded-3 px-4 py-2"
+              style={{ background: "#043c78" }}
             >
-              <option value="">Tất cả hãng</option>
-              {brands.map((b) => (
-                <option key={b.brandID} value={b.brandname}>
-                  {b.brandname}
-                </option>
-              ))}
-            </Form.Select>
-          </div>
-
-          <div className="col-12 col-sm-6 col-md-3">
-            <Form.Select onChange={(e) => setSort(e.target.value)} value={sort}>
-              <option value="">Sắp xếp theo giá</option>
-              <option value="asc">Giá tăng dần</option>
-              <option value="desc">Giá giảm dần</option>
-            </Form.Select>
-          </div>
-
-          <div className="col-12 col-md-2">
-            <div className="d-grid">
-              <Button
-                className="form-control button-timkiem"
-                onClick={handleSearch}
-              >
-                Tìm kiếm
-              </Button>
-            </div>
+              🔍 Tìm kiếm
+            </Button>
           </div>
         </div>
       </Form>
 
+      {/* danh sách xe */}
       <CarList filters={filters} />
     </div>
   );

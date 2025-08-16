@@ -11,6 +11,8 @@ exports.getCar = async (req, res) => {
     pickup_location,
     carname,
     sort,
+    startDate,
+    endDate,
   } = req.query;
 
   try {
@@ -51,6 +53,20 @@ exports.getCar = async (req, res) => {
     if (username) {
       conditions.push("Users.username = ?");
       params.push(username);
+    }
+
+    // Lọc theo ngày (xe rảnh trong khoảng)
+    if (startDate && endDate) {
+      conditions.push(`
+        Cars.carID NOT IN (
+          SELECT Contracts.carID
+          FROM Contracts
+          WHERE NOT (
+            Contracts.rental_end_date < ? OR Contracts.rental_start_date > ?
+          )
+        )
+      `);
+      params.push(startDate, endDate);
     }
 
     if (conditions.length > 0) {

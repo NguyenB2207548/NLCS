@@ -116,7 +116,7 @@ const Contracts = () => {
       <Table striped bordered hover>
         <thead className="table-dark border-light">
           <tr>
-            <th>ID</th>
+            <th>STT</th>
             <th>Người thuê</th>
             <th>Tên xe</th>
             <th>Chủ xe</th>
@@ -127,9 +127,9 @@ const Contracts = () => {
           </tr>
         </thead>
         <tbody>
-          {contracts.map((contract) => (
+          {contracts.map((contract, index) => (
             <tr key={contract.contractID}>
-              <td>{contract.contractID}</td>
+              <td>{index + 1}</td>
               <td>{contract.fullname}</td>
               <td>{contract.carname}</td>
               <td>{contract.owner}</td>

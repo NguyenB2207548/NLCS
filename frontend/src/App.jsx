@@ -20,6 +20,9 @@ import Products from "./Pages/Product/product";
 import AboutPage from "./Pages/Footer/AboutPage";
 // import PolicyPage from "./Pages/Footer/PolicyPage";
 import ContactPage from "./Pages/Footer/ContactPage";
+import StatContract from "./Pages/Admin/StatContract";
+import StatCar from "./Pages/Admin/StatCar";
+import StatRevenue from "./Pages/Admin/StatRevenue";
 
 function App() {
   const location = useLocation();
@@ -47,6 +50,9 @@ function App() {
             <Route path="users" element={<Users />} />
             <Route path="cars" element={<Cars />} />
             <Route path="contracts" element={<Contracts />} />
+            <Route path="statContracts" element={<StatContract />} />
+            <Route path="statCar" element={<StatCar />} />
+            <Route path="statRevenue" element={<StatRevenue />} />
           </Route>
 
           <Route path="/payment-success" element={<PaymentSuccess />} />

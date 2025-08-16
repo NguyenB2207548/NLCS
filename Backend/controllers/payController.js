@@ -9,7 +9,6 @@ exports.payContract = async (req, res) => {
   const paidAmount = parseFloat(amount);
 
   try {
-    // Kiểm tra hợp đồng có tồn tại và thuộc về người dùng
     const [[contract]] = await db.execute(
       "SELECT * FROM Contracts WHERE contractID = ? AND userID = ?",
       [contractID, userID]
@@ -25,7 +24,6 @@ exports.payContract = async (req, res) => {
       return res.status(400).json({ message: "Hợp đồng chưa được xác nhận" });
     }
 
-    // Lưu thanh toán mới
     await db.execute(
       `
             INSERT INTO Payments (payment_method, total_price, payment_status, amount, contractID)
@@ -33,7 +31,6 @@ exports.payContract = async (req, res) => {
       [payment_method, contract.total_price, "pending", paidAmount, contractID]
     );
 
-    // Tính tổng tiền đã thanh toán cho hợp đồng này
     const [[sum]] = await db.execute(
       `
             SELECT COALESCE(SUM(amount), 0) AS totalPaid 
@@ -42,9 +39,7 @@ exports.payContract = async (req, res) => {
       [contractID]
     );
 
-    // Nếu thanh toán đủ
     if (sum.totalPaid >= contract.total_price) {
-      // Cập nhật trạng thái hợp đồng và xe
       await db.execute(
         `UPDATE Contracts SET contract_status = 'completed' WHERE contractID = ?`,
         [contractID]
@@ -55,7 +50,6 @@ exports.payContract = async (req, res) => {
         [contract.carID]
       );
 
-      // Cập nhật tất cả bản ghi payment thành 'completed'
       await db.execute(
         `UPDATE Payments SET payment_status = 'completed' WHERE contractID = ?`,
         [contractID]
@@ -264,5 +258,24 @@ exports.confirmStripe = async (req, res) => {
     res
       .status(500)
       .json({ message: "Lỗi server khi xác nhận thanh toán Stripe." });
+  }
+};
+
+exports.getRevenue = async (req, res) => {
+  try {
+    const [rows] = await db.query(`
+      SELECT 
+        DATE_FORMAT(payment_date, '%Y-%m') AS month,
+        SUM(total_price) AS revenue
+      FROM Payments
+      WHERE payment_status = 'completed'
+      GROUP BY DATE_FORMAT(payment_date, '%Y-%m')
+      ORDER BY month ASC
+    `);
+
+    res.json(rows);
+  } catch (err) {
+    console.error("Error fetching revenue stats:", err);
+    res.status(500).json({ error: "Internal server error" });
   }
 };
