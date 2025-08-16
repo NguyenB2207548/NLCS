@@ -2,14 +2,14 @@ const db = require("../models/db");
 
 // Thêm hợp đồng
 exports.createRentalCar = async (req, res) => {
-  const userID = req.user.id;
+  const userID = req.user.id; // người thuê
   const carID = req.params.id;
   const { rental_start_date, rental_end_date } = req.body;
 
   const startDate = new Date(rental_start_date);
   const endDate = new Date(rental_end_date);
-
   const rentalDays = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
+
   if (rentalDays <= 0) {
     return res.status(400).json({ message: "Ngày thuê không hợp lệ" });
   }
@@ -22,7 +22,9 @@ exports.createRentalCar = async (req, res) => {
       return res.status(404).json({ message: "Không tìm thấy xe" });
     }
 
-    if (cars[0].car_status === "maintenance") {
+    const car = cars[0];
+
+    if (car.car_status === "maintenance") {
       return res
         .status(400)
         .json({ message: "Xe đang bảo trì, không thể thuê vào lúc này" });
@@ -30,11 +32,11 @@ exports.createRentalCar = async (req, res) => {
 
     const [overlapContracts] = await db.execute(
       `
-            SELECT * FROM Contracts
-            WHERE carID = ?
-              AND contract_status IN ('active')
-              AND NOT (rental_end_date < ? OR rental_start_date > ?)
-        `,
+        SELECT * FROM Contracts
+        WHERE carID = ?
+          AND contract_status IN ('active')
+          AND NOT (rental_end_date < ? OR rental_start_date > ?)
+      `,
       [carID, rental_start_date, rental_end_date]
     );
 
@@ -44,16 +46,29 @@ exports.createRentalCar = async (req, res) => {
         .json({ message: "Xe đang được thuê trong khoảng thời gian này" });
     }
 
-    const pricePerDay = cars[0].price_per_date;
+    const pricePerDay = car.price_per_date;
     const totalPrice = rentalDays * pricePerDay;
 
     await db.execute(
-      `INSERT INTO Contracts (rental_start_date, rental_end_date, total_price, userID, carID)
-             VALUES (?, ?, ?, ?, ?)`,
+      `INSERT INTO Contracts (rental_start_date, rental_end_date, total_price, userID, carID, contract_status)
+       VALUES (?, ?, ?, ?, ?, 'pending')`,
       [rental_start_date, rental_end_date, totalPrice, userID, carID]
     );
 
-    res.status(200).json({ message: "Đăng ký thuê xe thành công" });
+    // Gửi thông báo cho chủ xe
+    const message = `Người dùng đã gửi yêu cầu thuê xe "${car.carname}" (từ ${rental_start_date} đến ${rental_end_date}). Vui lòng xem xét và duyệt hợp đồng.`;
+
+    await db.execute(
+      `INSERT INTO Notifications (userID, message, is_read, created_at)
+       VALUES (?, ?, 0, NOW())`,
+      [car.userID, message]
+    );
+
+    req.sendNotification(car.userID, message);
+
+    res.status(200).json({
+      message: "Đăng ký thuê xe thành công, đã gửi thông báo cho chủ xe",
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Lỗi server khi tạo hợp đồng thuê" });

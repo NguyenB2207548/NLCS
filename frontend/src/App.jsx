@@ -18,7 +18,7 @@ import PaymentSuccess from "./Pages/Payment/PaymentSuccess";
 import PaymentCancel from "./Pages/Payment/PaymentCancel";
 import Products from "./Pages/Product/product";
 import AboutPage from "./Pages/Footer/AboutPage";
-// import PolicyPage from "./Pages/Footer/PolicyPage";
+import PolicyPage from "./Pages/Footer/PolicyPage";
 import ContactPage from "./Pages/Footer/ContactPage";
 import StatContract from "./Pages/Admin/StatContract";
 import StatCar from "./Pages/Admin/StatCar";
@@ -41,7 +41,7 @@ function App() {
           <Route path="/rental/history" element={<RentalHistory />} />
           <Route path="/products" element={<Products />} />
           <Route path="/about" element={<AboutPage />} />
-          {/* <Route path="/policy" element={<PolicyPage />} /> */}
+          <Route path="/policy" element={<PolicyPage />} />
           <Route path="/contact" element={<ContactPage />} />
 
           <Route path="/admin" element={<AdminPage />}>

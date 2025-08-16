@@ -47,8 +47,10 @@ const Home = () => {
           backgroundPosition: "center",
           minHeight: "80vh",
           position: "relative",
+          padding: "0 15px", // tránh text dính sát màn nhỏ
         }}
       >
+        {/* Overlay */}
         <div
           style={{
             position: "absolute",
@@ -60,18 +62,25 @@ const Home = () => {
           }}
         ></div>
 
-        <div style={{ position: "relative", zIndex: 1 }}>
+        {/* Content */}
+        <div style={{ position: "relative", zIndex: 1, maxWidth: "800px" }}>
           <h1
-            className="display-4 fw-bold mb-4"
+            className="fw-bold mb-4"
             style={{
-              fontSize: "3rem",
+              fontSize: "clamp(1.8rem, 5vw, 3rem)", // co dãn theo màn hình
               fontWeight: "bold",
               textShadow: "2px 2px 8px rgba(0,0,0,0.7)",
             }}
           >
             Chào mừng đến với hệ thống thuê xe du lịch
           </h1>
-          <p className="lead">
+          <p
+            className="lead"
+            style={{
+              fontSize: "clamp(1rem, 2.5vw, 1.25rem)", // tự động thu nhỏ
+              marginBottom: "1.5rem",
+            }}
+          >
             Khám phá hàng trăm mẫu xe đa dạng, đặt xe nhanh chóng và an toàn
             tuyệt đối.
           </p>
@@ -85,7 +94,7 @@ const Home = () => {
               borderRadius: "50px",
               fontSize: "1.1rem",
               transition: "all 0.3s ease",
-              display: "inline-block", // giữ form giống nút
+              display: "inline-block",
               textDecoration: "none",
               textAlign: "center",
             }}
@@ -114,7 +123,7 @@ const Home = () => {
         <div className="container">
           <div className="row">
             {luxuryCars.map((car) => (
-              <div key={car.carID} className="col-md-3 mb-4">
+              <div key={car.carID} className="col-md-6 col-lg-3 mb-4">
                 <CarCard car={car} />
               </div>
             ))}
@@ -141,7 +150,7 @@ const Home = () => {
         <div className="container">
           <div className="row">
             {cheapCars.map((car) => (
-              <div key={car.carID} className="col-md-3 mb-4">
+              <div key={car.carID} className="col-md-6 col-lg-3 mb-4">
                 <CarCard car={car} />
               </div>
             ))}

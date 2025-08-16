@@ -1,0 +1,23 @@
+@media (max-width: 768px) {
+  .table td,
+  .table th {
+    font-size: 12px;
+    padding: 6px;
+  }
+
+  .card {
+    padding: 1rem !important;
+  }
+
+  .btn-sm {
+    font-size: 12px;
+    padding: 4px 8px;
+  }
+}
+
+@media (max-width: 576px) {
+  .btn-history {
+    font-size: 10px !important;
+    padding: 8px 12px;
+  }
+}

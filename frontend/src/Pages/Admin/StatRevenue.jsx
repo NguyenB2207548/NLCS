@@ -69,7 +69,7 @@ const StatRevenue = () => {
               ]}
             />
             <Legend />
-            <Bar dataKey="revenue" fill="#82ca9d" name="Doanh thu (triệu)">
+            <Bar dataKey="revenue" fill="#043c78" name="Doanh thu (triệu)">
               <LabelList
                 dataKey="revenue"
                 position="top"

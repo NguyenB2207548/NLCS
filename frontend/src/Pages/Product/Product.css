@@ -1,0 +1,14 @@
+@media (max-width: 576px) {
+  .filter-form {
+    padding: 1rem !important;
+  }
+
+  .filter-form select,
+  .filter-form input {
+    font-size: 14px;
+  }
+
+  .filter-form button {
+    width: 100%;
+  }
+}

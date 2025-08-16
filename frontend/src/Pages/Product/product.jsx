@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Form, Button } from "react-bootstrap";
 import CarList from "../../components/CarList";
+import "./Product.css";
 
 const Products = () => {
   const [location, setLocation] = useState("");

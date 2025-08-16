@@ -46,7 +46,7 @@ const StatContract = () => {
             <YAxis allowDecimals={false} />
             <Tooltip />
             <Legend />
-            <Bar dataKey="contracts" fill="#8884d8" name="Số hợp đồng">
+            <Bar dataKey="contracts" fill="#043c78" name="Số hợp đồng">
               {/* số liệu bên trên cột */}
               <LabelList dataKey="contracts" position="top" />
             </Bar>

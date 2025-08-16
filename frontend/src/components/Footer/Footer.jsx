@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import "./Footer.css"; // Bạn có thể thêm CSS riêng nếu cần
+import "./Footer.css";
 
 const Footer = () => {
   return (
@@ -16,7 +16,7 @@ const Footer = () => {
           <Link to="/contact" className="text-muted me-3">
             Liên hệ
           </Link>
-          <Link to="/chinh-sach" className="text-muted">
+          <Link to="/policy" className="text-muted">
             Chính sách
           </Link>
         </div>

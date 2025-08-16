@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Card, Table, Button } from "react-bootstrap";
 import PaymentModal from "../../components/Modal/PaymentModal";
+import "./RentalHistory.css";
 
 const RentalHistory = () => {
   const [history, setHistory] = useState([]);
@@ -87,9 +88,12 @@ const RentalHistory = () => {
   };
 
   return (
-    <Card className="p-4 shadow-sm w-75 mx-auto mt-4">
+    <Card
+      className="p-4 shadow-sm w-75 mx-auto mt-4"
+      // style={{ maxWidth: "1000px" }}
+    >
       <h3 className="mb-4 text-center">Lịch sử thuê xe</h3>
-      <Table striped bordered hover>
+      <Table striped bordered hover responsive>
         <thead className="table-dark border-light">
           <tr>
             <th>Tên xe</th>
@@ -145,6 +149,7 @@ const RentalHistory = () => {
                   <td>
                     {item.contract_status === "pending" && (
                       <Button
+                        className="btn-history"
                         variant="danger"
                         size="sm"
                         onClick={() => cancelContract(item.contractID)}
@@ -156,6 +161,7 @@ const RentalHistory = () => {
                     {item.contract_status === "active" && (
                       <>
                         <Button
+                          className="btn-history"
                           variant="primary"
                           size="sm"
                           onClick={() => openPaymentModal(item)}
@@ -170,6 +176,7 @@ const RentalHistory = () => {
                     {(item.contract_status === "completed" ||
                       item.contract_status === "cancelled") && (
                       <Button
+                        className="btn-history"
                         variant="outline-danger"
                         size="sm"
                         onClick={() => handleDelete(item.contractID)}
