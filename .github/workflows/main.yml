@@ -1,13 +1,15 @@
-name: Deploy React App to GitHub Pages
+name: Deploy Vite app to GitHub Pages
 
 on:
   push:
     branches:
-      - main   # hoặc master nếu repo bạn dùng master
+      - main  # deploy khi có push lên nhánh main
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write   # cấp quyền ghi để push lên gh-pages
 
     steps:
       - name: Checkout code
@@ -19,16 +21,15 @@ jobs:
           node-version: 18
 
       - name: Install dependencies
+        working-directory: ./frontend
         run: npm install
-        working-directory: ./frontend   # 👈 chạy trong thư mục frontend
 
       - name: Build project
+        working-directory: ./frontend
         run: npm run build
-        working-directory: ./frontend   # 👈 build trong thư mục frontend
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./frontend/dist   # 👈 dist nằm trong frontend
-
+          publish_dir: ./frontend/dist
