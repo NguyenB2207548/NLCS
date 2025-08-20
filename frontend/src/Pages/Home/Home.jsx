@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./Home.css";
 import { Button } from "react-bootstrap";
-import CarCard from "../../components/CarCard"; // Bạn tạo CarCard hiển thị 1 xe
+import CarCard from "../../components/CarCard";
 import { Link } from "react-router-dom";
 import img_home from "../../assets/img_homepage.jpg";
 
@@ -47,7 +47,7 @@ const Home = () => {
           backgroundPosition: "center",
           minHeight: "80vh",
           position: "relative",
-          padding: "0 15px", // tránh text dính sát màn nhỏ
+          padding: "0 15px",
         }}
       >
         {/* Overlay */}
