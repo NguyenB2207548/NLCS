@@ -3,10 +3,10 @@ name: Deploy React App to GitHub Pages
 on:
   push:
     branches:
-      - main   # hoặc master, tùy branch bạn dùng
+      - main   # hoặc master nếu repo bạn dùng master
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
@@ -20,12 +20,15 @@ jobs:
 
       - name: Install dependencies
         run: npm install
+        working-directory: ./frontend   # 👈 chạy trong thư mục frontend
 
       - name: Build project
         run: npm run build
+        working-directory: ./frontend   # 👈 build trong thư mục frontend
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist   # Vite xuất ra thư mục dist
+          publish_dir: ./frontend/dist   # 👈 dist nằm trong frontend
+
