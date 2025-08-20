@@ -82,7 +82,7 @@ const Home = () => {
             }}
           >
             Khám phá hàng trăm mẫu xe đa dạng, đặt xe nhanh chóng và an toàn
-            tuyệt đối.
+            tuyệt đối
           </p>
           <Link
             to="/products"
