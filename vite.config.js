@@ -8,6 +8,7 @@ export default defineConfig({
   },
   esbuild: {
     loader: "jsx",
-    include: /\.(js|jsx)$/, // process all js/jsx files
+    include: /\.(js|jsx)$/,
   },
+  base: "/NLCS/",
 });

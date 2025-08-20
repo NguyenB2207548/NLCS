@@ -72,7 +72,7 @@ create table Car_images (
 
 CREATE TABLE Notifications (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    userID INT NOT NULL,
+    userID INT NOT NULL,123
     message TEXT,
     is_read BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
