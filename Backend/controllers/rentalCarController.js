@@ -46,6 +46,24 @@ exports.createRentalCar = async (req, res) => {
         .json({ message: "Xe đang được thuê trong khoảng thời gian này" });
     }
 
+    // 2. Kiểm tra user có thuê cùng xe trùng lịch không
+    const [userCarOverlap] = await db.execute(
+      `
+    SELECT * FROM Contracts
+    WHERE userID = ?
+      AND carID = ?
+      AND contract_status IN ('active', 'pending')
+      AND NOT (rental_end_date < ? OR rental_start_date > ?)
+  `,
+      [userID, carID, rental_start_date, rental_end_date]
+    );
+
+    if (userCarOverlap.length > 0) {
+      return res.status(400).json({
+        message: "Bạn đã có hợp đồng thuê xe này trong cùng khoảng thời gian",
+      });
+    }
+
     const pricePerDay = car.price_per_date;
     const totalPrice = rentalDays * pricePerDay;
 
@@ -235,7 +253,7 @@ exports.rejectContract = async (req, res) => {
   try {
     const [contracts] = await db.execute(
       `
-            SELECT ct.*
+            SELECT ct.*, c.carname
             FROM Contracts ct
             JOIN Cars c ON ct.carID = c.carID
             WHERE c.userID = ? AND ct.contractID = ?
@@ -253,9 +271,20 @@ exports.rejectContract = async (req, res) => {
       "UPDATE Contracts SET contract_status = ? WHERE contractID = ?",
       [contract_status, contractID]
     );
+    function formatDate(date) {
+      const d = new Date(date);
+      const day = String(d.getDate()).padStart(2, "0");
+      const month = String(d.getMonth() + 1).padStart(2, "0");
+      const year = d.getFullYear();
+      return `${day}/${month}/${year}`;
+    }
 
     const renterID = contracts[0].userID;
-    const message = "Hợp đồng đã bị từ chối";
+    const message = `Hợp đồng thuê xe "${contracts[0].carname}" 
+          (từ ${formatDate(contracts[0].rental_start_date)} đến ${formatDate(
+      contracts[0].rental_end_date
+    )}) 
+          đã bị chủ xe từ chối.`;
 
     req.sendNotification(renterID, message);
     await db.execute(

@@ -90,8 +90,8 @@ exports.getCurrentRentedCars = async (req, res) => {
             GREATEST(DATEDIFF(ct.rental_end_date, CURDATE()), 0) AS days_left
             FROM Contracts ct
             JOIN Cars   c     ON ct.carID = c.carID
-            JOIN Users  u     ON ct.userID = u.userID        -- người thuê
-            JOIN Users  owner ON c.userID  = owner.userID     -- chủ xe
+            JOIN Users  u     ON ct.userID = u.userID        
+            JOIN Users  owner ON c.userID  = owner.userID   
             WHERE ct.contract_status = 'active'
             ORDER BY c.carname ASC, ct.rental_start_date ASC;
 

@@ -15,7 +15,6 @@ const StatContract = () => {
   const [data, setData] = useState([]);
 
   useEffect(() => {
-    // Gọi API backend để lấy dữ liệu số hợp đồng theo tháng
     const fetchData = async () => {
       try {
         const res = await fetch("http://localhost:3000/admin/contract/stat");

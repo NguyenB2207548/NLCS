@@ -66,7 +66,9 @@ const RentalModal = ({
         if (
           result.message === "Xe đang được thuê trong khoảng thời gian này" ||
           result.message === "Xe đang bảo trì, không thể thuê vào lúc này" ||
-          result.message === "Ngày thuê không hợp lệ"
+          result.message === "Ngày thuê không hợp lệ" ||
+          result.message ===
+            "Bạn đã có hợp đồng thuê xe này trong cùng khoảng thời gian"
         ) {
           alert(result.message);
           handleClose();

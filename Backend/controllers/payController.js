@@ -178,7 +178,7 @@ exports.createCheckout = async (req, res) => {
             product_data: {
               name: `Thuê xe: ${contract.carname}`,
             },
-            unit_amount: Math.round((unpaidAmount / 27000) * 100), // chuyển sang cent (USD)
+            unit_amount: Math.round((unpaidAmount / 27000) * 100),
           },
           quantity: 1,
         },
@@ -186,8 +186,8 @@ exports.createCheckout = async (req, res) => {
       metadata: {
         contractID: String(contractID),
       },
-      success_url: `http://localhost:5000/payment-success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `http://localhost:5000/payment-cancel`,
+      success_url: `http://localhost:5173/NLCS/payment-success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `http://localhost:5173/NLCS/payment-cancel`,
     });
 
     res.json({ url: session.url });

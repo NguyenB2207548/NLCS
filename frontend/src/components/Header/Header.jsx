@@ -122,6 +122,7 @@ const Header = () => {
   };
 
   const handleLogout = () => {
+    socket.disconnect();
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     setIsLoggedIn(false);
@@ -291,9 +292,7 @@ const Header = () => {
         {/* Toast Notification */}
         <ToastContainer position="top-end" className="p-3">
           <Toast
-            bg={
-              alertMessage === "Hợp đồng đã bị từ chối" ? "danger" : "success"
-            }
+            bg={alertMessage.includes("từ chối") ? "danger" : "success"}
             onClose={() => {
               setShowToast(false);
               setAlertMessage("");
@@ -304,7 +303,7 @@ const Header = () => {
           >
             <Toast.Header closeButton>
               <strong className="me-auto">
-                {alertMessage === "Hợp đồng đã bị từ chối"
+                {alertMessage.includes("từ chối")
                   ? "❌ Thông báo"
                   : "✅ Thông báo"}
               </strong>

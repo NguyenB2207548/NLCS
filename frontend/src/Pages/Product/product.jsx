@@ -13,7 +13,6 @@ const Products = () => {
   const handleSearch = (e) => {
     e.preventDefault();
 
-    // validate ngày
     if (startDate && !endDate) {
       alert("Vui lòng chọn ngày kết thúc khi đã chọn ngày bắt đầu!");
       return;
@@ -34,7 +33,6 @@ const Products = () => {
         onSubmit={handleSearch}
         style={{ maxWidth: "800px" }}
       >
-        {/* Hàng 1: vị trí + số chỗ */}
         <div className="row g-3 mb-3">
           <div className="col-12 col-md-6">
             <Form.Select
@@ -66,7 +64,6 @@ const Products = () => {
           </div>
         </div>
 
-        {/* Hàng 2: ngày bắt đầu + ngày kết thúc */}
         <div className="row g-3 mb-3">
           <div className="col-12 col-md-6">
             <Form.Control
@@ -82,13 +79,12 @@ const Products = () => {
               value={endDate}
               onChange={(e) => setEndDate(e.target.value)}
               className="py-2"
-              min={startDate || undefined} // chỉ cho phép chọn ngày >= startDate
-              required={!!startDate} // bắt buộc khi đã chọn ngày bắt đầu
+              min={startDate || undefined}
+              required={!!startDate}
             />
           </div>
         </div>
 
-        {/* Hàng 3: nút tìm kiếm */}
         <div className="row">
           <div className="col-12 d-flex justify-content-center">
             <Button

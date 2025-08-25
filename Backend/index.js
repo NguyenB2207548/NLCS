@@ -53,7 +53,6 @@ io.on("connection", (socket) => {
 
 function sendNotification(userId, message) {
   const socketId = onlineUsers[userId];
-  //   console.log(socketId);
   if (socketId) {
     io.to(socketId).emit("notification", message);
   }

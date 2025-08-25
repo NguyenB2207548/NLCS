@@ -61,7 +61,8 @@ exports.getCar = async (req, res) => {
         Cars.carID NOT IN (
           SELECT Contracts.carID
           FROM Contracts
-          WHERE NOT (
+          WHERE contract_status = 'active'
+          AND NOT (
             Contracts.rental_end_date < ? OR Contracts.rental_start_date > ?
           )
         )

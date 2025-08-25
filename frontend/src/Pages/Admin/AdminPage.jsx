@@ -1,5 +1,5 @@
 import React from "react";
-import { Outlet, Navigate, useNavigate } from "react-router-dom";
+import { Outlet, Navigate, useNavigate, NavLink } from "react-router-dom";
 import { Container, Nav, Navbar } from "react-bootstrap";
 import { jwtDecode } from "jwt-decode";
 import "./Admin.css";
@@ -26,15 +26,27 @@ const AdminPage = () => {
             Admin Panel
           </Navbar.Brand>
           <Nav className="flex-column gap-2 flex-grow-1">
-            <Nav.Link href="/admin/dashboard">📊 Dashboard</Nav.Link>
-            <Nav.Link href="/admin/users">👤 Người dùng</Nav.Link>
-            <Nav.Link href="/admin/cars">🚗 Xe</Nav.Link>
-            <Nav.Link href="/admin/contracts">📄 Hợp đồng</Nav.Link>
-            <Nav.Link href="/admin/statCar">📅 Lịch xe đang được thuê</Nav.Link>
-            <Nav.Link href="/admin/statContracts">
+            <Nav.Link as={NavLink} to="/admin/dashboard">
+              📊 Dashboard
+            </Nav.Link>
+            <Nav.Link as={NavLink} to="/admin/users">
+              👤 Người dùng
+            </Nav.Link>
+            <Nav.Link as={NavLink} to="/admin/cars">
+              🚗 Xe
+            </Nav.Link>
+            <Nav.Link as={NavLink} to="/admin/contracts">
+              📄 Hợp đồng
+            </Nav.Link>
+            <Nav.Link as={NavLink} to="/admin/statCar">
+              📅 Lịch xe đang được thuê
+            </Nav.Link>
+            <Nav.Link as={NavLink} to="/admin/statContracts">
               📊 Số hợp đồng theo tháng
             </Nav.Link>
-            <Nav.Link href="/admin/statRevenue">📊 Thông kê doanh thu</Nav.Link>
+            <Nav.Link as={NavLink} to="/admin/statRevenue">
+              📊 Thống kê doanh thu
+            </Nav.Link>
           </Nav>
         </Navbar>
 

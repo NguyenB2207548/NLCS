@@ -1,13 +1,13 @@
-import React, { useState } from 'react';
-import { Modal, Button, Form } from 'react-bootstrap';
+import React, { useState } from "react";
+import { Modal, Button, Form } from "react-bootstrap";
 
 const RegisterModal = ({ show, handleClose, handleRegister }) => {
   const [formData, setFormData] = useState({
-    username: '',
-    password: '',
-    fullname: '',
-    date_of_birth: '',
-    phone_number: '',
+    username: "",
+    password: "",
+    fullname: "",
+    date_of_birth: "",
+    phone_number: "",
   });
 
   const [errors, setErrors] = useState({});
@@ -22,7 +22,7 @@ const RegisterModal = ({ show, handleClose, handleRegister }) => {
 
     let newErrors = { ...errors };
 
-    if (name === 'username') {
+    if (name === "username") {
       const usernameErrors = [];
 
       if (value.length < 6) {
@@ -32,7 +32,9 @@ const RegisterModal = ({ show, handleClose, handleRegister }) => {
         usernameErrors.push("Không được chứa khoảng trắng.");
       }
       if (!/^[a-zA-Z0-9]+$/.test(value)) {
-        usernameErrors.push("Chỉ được chứa chữ cái và số, không chứa ký tự đặc biệt.");
+        usernameErrors.push(
+          "Chỉ được chứa chữ cái và số, không chứa ký tự đặc biệt."
+        );
       }
 
       if (usernameErrors.length > 0) {
@@ -42,9 +44,7 @@ const RegisterModal = ({ show, handleClose, handleRegister }) => {
       }
     }
 
-
-
-    if (name === 'fullname') {
+    if (name === "fullname") {
       if (!/^[\p{L}0-9 ]+$/u.test(value)) {
         newErrors.fullname = "Họ và tên chỉ được chứa chữ, số và khoảng trắng.";
       } else {
@@ -52,7 +52,7 @@ const RegisterModal = ({ show, handleClose, handleRegister }) => {
       }
     }
 
-    if (name === 'phone_number') {
+    if (name === "phone_number") {
       const phoneNumberErrors = [];
 
       if (!/^\d+$/.test(value)) {
@@ -72,8 +72,7 @@ const RegisterModal = ({ show, handleClose, handleRegister }) => {
       }
     }
 
-
-    if (name === 'password') {
+    if (name === "password") {
       const passwordErrors = [];
 
       if (value.length < 8 || value.length > 24) {
@@ -124,7 +123,9 @@ const RegisterModal = ({ show, handleClose, handleRegister }) => {
         usernameErrors.push("Không được chứa khoảng trắng.");
       }
       if (!/^[a-zA-Z0-9]+$/.test(formData.username)) {
-        usernameErrors.push("Chỉ được chứa chữ cái và số, không chứa ký tự đặc biệt.");
+        usernameErrors.push(
+          "Chỉ được chứa chữ cái và số, không chứa ký tự đặc biệt."
+        );
       }
     }
 
@@ -167,7 +168,8 @@ const RegisterModal = ({ show, handleClose, handleRegister }) => {
     }
 
     if (!/^\d{10,11}$/.test(formData.phone_number)) {
-      newErrors.phone_number = "Số điện thoại phải chứa 10 đến 11 chữ số, không có khoảng trắng hoặc ký tự đặc biệt.";
+      newErrors.phone_number =
+        "Số điện thoại phải chứa 10 đến 11 chữ số, không có khoảng trắng hoặc ký tự đặc biệt.";
     }
 
     if (Object.keys(newErrors).length > 0) {
@@ -181,11 +183,11 @@ const RegisterModal = ({ show, handleClose, handleRegister }) => {
     if (result.success) {
       setErrors({});
       setFormData({
-        username: '',
-        password: '',
-        fullname: '',
-        date_of_birth: '',
-        phone_number: '',
+        username: "",
+        password: "",
+        fullname: "",
+        date_of_birth: "",
+        phone_number: "",
       });
     } else if (result.errors) {
       setErrors(result.errors);
@@ -194,11 +196,11 @@ const RegisterModal = ({ show, handleClose, handleRegister }) => {
 
   const handleCloseModal = () => {
     setFormData({
-      username: '',
-      password: '',
-      fullname: '',
-      date_of_birth: '',
-      phone_number: '',
+      username: "",
+      password: "",
+      fullname: "",
+      date_of_birth: "",
+      phone_number: "",
     });
     setErrors({});
     handleClose();
@@ -207,7 +209,7 @@ const RegisterModal = ({ show, handleClose, handleRegister }) => {
   return (
     <Modal show={show} onHide={handleCloseModal} centered>
       <Modal.Header closeButton>
-        <Modal.Title>Đăng ký tài khoản</Modal.Title>
+        <Modal.Title className="fw-bold">Đăng ký tài khoản</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <Form onSubmit={onSubmit}>
@@ -233,7 +235,6 @@ const RegisterModal = ({ show, handleClose, handleRegister }) => {
                 errors.username
               )}
             </Form.Control.Feedback>
-
           </Form.Group>
 
           <Form.Group className="mb-3" controlId="registerPassword">
@@ -309,7 +310,6 @@ const RegisterModal = ({ show, handleClose, handleRegister }) => {
                 errors.phone_number
               )}
             </Form.Control.Feedback>
-
           </Form.Group>
 
           <div className="d-grid">
