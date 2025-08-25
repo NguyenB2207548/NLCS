@@ -1,106 +1,94 @@
-create database car_db;
-use car_db;
+-- Tạo database
+CREATE DATABASE car_db;
+USE car_db;
 
-create table Users (
-	userID int auto_increment,
-    username varchar(100) not null unique,
-    password varchar(100) not null,
-    fullname varchar(100) not null,
-    date_of_birth date,
-    phone_number varchar(100) not null,
-    primary key (userID)
+-- Bảng Users
+CREATE TABLE Users (
+    userID INT AUTO_INCREMENT,
+    username VARCHAR(100) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    fullname VARCHAR(100) NOT NULL,
+    date_of_birth DATE,
+    phone_number VARCHAR(20),
+    admin BOOLEAN DEFAULT FALSE,
+    is_active BOOLEAN DEFAULT TRUE,
+    PRIMARY KEY (userID)
 );
 
-create table Brands (
-	brandID int auto_increment,
-    brandname varchar(100) not null,
-    country varchar(100),
-    founded_year int,
-    logo_URL varchar(255),
-    primary key (brandID)
+-- Bảng Brands
+CREATE TABLE Brands (
+    brandID INT AUTO_INCREMENT,
+    brandname VARCHAR(100) NOT NULL,
+    country VARCHAR(100),
+    founded_year INT,
+    logo_URL VARCHAR(255),
+    PRIMARY KEY (brandID)
 );
 
-create table Cars (
-	carID int auto_increment,
-    carname varchar(100) not null,
-    license_plate varchar(100) not null unique,
-    year_manufacture int,
-    seats int,
-    fuel_type varchar(100),
-    car_status ENUM('available', 'rented', 'maintenance') default 'available',
-    pickup_location varchar(100),
-	price_per_date double,
-    userID int,
-    brandID int,
-    primary key (carID),
-    foreign key (userID) references Users (userID),
-    foreign key (brandID) references Brands (brandID)
+-- Bảng Cars
+CREATE TABLE Cars (
+    carID INT AUTO_INCREMENT,
+    carname VARCHAR(100) NOT NULL,
+    license_plate VARCHAR(50) NOT NULL UNIQUE,
+    year_manufacture INT,
+    seats INT,
+    fuel_type VARCHAR(50),
+    car_status ENUM('available', 'rented', 'maintenance') DEFAULT 'available',
+    pickup_location VARCHAR(255),
+    price_per_date DOUBLE NOT NULL,
+    userID INT NOT NULL, -- chủ xe
+    brandID INT,
+    img_URL VARCHAR(255),
+    PRIMARY KEY (carID),
+    FOREIGN KEY (userID) REFERENCES Users(userID) ON DELETE CASCADE,
+    FOREIGN KEY (brandID) REFERENCES Brands(brandID) ON DELETE SET NULL
 );
 
-create table Contracts (
-	contractID int auto_increment,
-    rental_start_date date not null,
-    rental_end_date date not null,
-    contract_status ENUM ('pending', 'active', 'completed', 'cancelled') default 'pending',
-    total_price double,
-	userID int not null,
-    carID int not null,
-    primary key (contractID),
-    foreign key (userID) references Users(userID),
-    foreign key (carID) references Cars(carID),
-    constraint chk_dates check (rental_start_date < rental_end_date)
+-- Bảng car_images (ảnh phụ)
+CREATE TABLE car_images (
+    img_ID INT AUTO_INCREMENT,
+    carID INT NOT NULL,
+    imgURL VARCHAR(255) NOT NULL,
+    PRIMARY KEY (img_ID),
+    FOREIGN KEY (carID) REFERENCES Cars(carID) ON DELETE CASCADE
 );
 
-create table Payments (
-	paymentID int auto_increment,
-    payment_date date,
-    payment_method varchar(100),
-    total_price double,
-    payment_status ENUM ('pending', 'completed', 'failed', 'refunded') default 'pending',
-    contractID int not null,
-    primary key (paymentID),
-    foreign key (contractID) references Contracts (contractID)
+-- Bảng Contracts
+CREATE TABLE Contracts (
+    contractID INT AUTO_INCREMENT,
+    rental_start_date DATE NOT NULL,
+    rental_end_date DATE NOT NULL,
+    contract_status ENUM('pending', 'active', 'completed', 'cancelled') DEFAULT 'pending',
+    total_price DOUBLE,
+    userID INT NOT NULL,  -- người thuê
+    carID INT NOT NULL,
+    is_deleted BOOLEAN DEFAULT FALSE,
+    PRIMARY KEY (contractID),
+    FOREIGN KEY (userID) REFERENCES Users(userID) ON DELETE CASCADE,
+    FOREIGN KEY (carID) REFERENCES Cars(carID) ON DELETE CASCADE,
+    CONSTRAINT chk_dates CHECK (rental_start_date < rental_end_date)
 );
 
-create table Car_images (
-	imgID int auto_increment,
-    carID int,
-    imgURL varchar(255),
-    primary key (imgID),
-    foreign key (carID) references Cars(carID) ON DELETE CASCADE
+-- Bảng Payments
+CREATE TABLE Payments (
+    paymentID INT AUTO_INCREMENT,
+    payment_date DATE,
+    payment_method VARCHAR(100),
+    total_price DOUBLE,
+    amount DOUBLE,
+    payment_status ENUM('pending', 'completed', 'failed', 'refunded') DEFAULT 'pending',
+    contractID INT NOT NULL,
+    PRIMARY KEY (paymentID),
+    FOREIGN KEY (contractID) REFERENCES Contracts(contractID) ON DELETE CASCADE
 );
 
+-- Bảng Notifications
 CREATE TABLE Notifications (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    userID INT NOT NULL,123
+    id INT AUTO_INCREMENT,
+    userID INT NOT NULL,
     message TEXT,
     is_read BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
     FOREIGN KEY (userID) REFERENCES Users(userID) ON DELETE CASCADE
 );
-
-ALTER TABLE Users ADD COLUMN admin BOOLEAN DEFAULT FALSE;
-alter table Cars add column img_URL varchar(255);
-
-
-ALTER TABLE Payments
-MODIFY COLUMN payment_date DATETIME DEFAULT CURRENT_TIMESTAMP;
-
-ALTER TABLE Users ADD COLUMN is_active BOOLEAN DEFAULT true;
-
-ALTER TABLE Contracts MODIFY carID INT NULL;
-
-ALTER TABLE Contracts DROP FOREIGN KEY contracts_ibfk_2;
-
-ALTER TABLE Contracts
-ADD CONSTRAINT fk_car_contract
-FOREIGN KEY (carID) REFERENCES Cars(carID)
-ON DELETE SET NULL;
-
-ALTER TABLE Contracts ADD COLUMN is_deleted BOOLEAN DEFAULT FALSE;
-
-ALTER TABLE Payments ADD COLUMN amount DECIMAL(10,2) NOT NULL AFTER total_price;
-
-ALTER TABLE Payments
-MODIFY COLUMN amount DOUBLE NOT NULL;
-
