@@ -1,8 +1,9 @@
 # Website Thuê Xe Du Lịch Tự Lái
 
 Cài đặt:
+```bash
  git clone https://github.com/NguyenB2207548/NLCS.git
- cd NLCS
+ d NLCS
  
 Cấu hình Database:
   mysql -u root -p < Backend/models/scheme.sql
