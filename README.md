@@ -1,23 +1,26 @@
 # Website Thuê Xe Du Lịch Tự Lái
 
-Cài đặt:
+## 1.Cài đặt source code:
 ```bash
  git clone https://github.com/NguyenB2207548/NLCS.git
  cd NLCS
  
-Cấu hình Database:
+2.Cấu hình Database
   mysql -u root -p < Backend/models/scheme.sql
-Dữ liệu mẫu:
+3.Dữ liệu mẫu:
   mysql -u root -p < Backend/models/data.sql
-Lưu ý: 
-  Sửa user, password, database trong file Backend/models/db.js (cấu hình kết nối MySQL)
-  Nên tạo tài khoản mới để đăng nhập (không dùng tài khoản mẫu)
+## Lưu ý: 
+  ## Sửa user, password, database trong file Backend/models/db.js (cấu hình kết nối MySQL)
+  ## Nên tạo tài khoản mới để đăng nhập (không dùng tài khoản mẫu)
  
-Chạy Backend:
+4.Chạy Backend:
   cd Backend
   npm install
   npm run dev
- Chạy Frontend:
+
+5.Chạy Frontend:
   cd frontend
   npm install
   npm run dev
+
+
