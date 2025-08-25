@@ -3,7 +3,7 @@
 Cài đặt:
 ```bash
  git clone https://github.com/NguyenB2207548/NLCS.git
- d NLCS
+ cd NLCS
  
 Cấu hình Database:
   mysql -u root -p < Backend/models/scheme.sql
